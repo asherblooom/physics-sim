@@ -1,0 +1,6 @@
+compile_commands.json
+.clangd
+.cache/clangd/*
+.clang-format
+obj/
+game
