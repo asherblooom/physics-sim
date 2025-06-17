@@ -20,8 +20,13 @@ Shader ResourceManager::LoadShader(std::string name, const char *vShaderFile, co
 	std::string geometryCode;
 	try {
 		// open files
-		std::ifstream vertexShaderFile(vShaderFile);
-		std::ifstream fragmentShaderFile(fShaderFile);
+		std::ifstream vertexShaderFile{vShaderFile};
+		std::ifstream fragmentShaderFile{fShaderFile};
+		if (!vertexShaderFile)
+			std::cout << "no vertex shader" << std::endl;
+		if (!fragmentShaderFile)
+			std::cout << "no fragment shader" << std::endl;
+
 		std::stringstream vShaderStream, fShaderStream;
 		// read file's buffer contents into streams
 		vShaderStream << vertexShaderFile.rdbuf();
@@ -35,6 +40,8 @@ Shader ResourceManager::LoadShader(std::string name, const char *vShaderFile, co
 		// if geometry shader path is present, also load a geometry shader
 		if (gShaderFile != nullptr) {
 			std::ifstream geometryShaderFile(gShaderFile);
+			if (!geometryShaderFile)
+				std::cout << "no geometry shader" << std::endl;
 			std::stringstream gShaderStream;
 			gShaderStream << geometryShaderFile.rdbuf();
 			geometryShaderFile.close();
