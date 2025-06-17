@@ -2,11 +2,11 @@
 #define GAME_HPP
 
 class Game {
-   private:
-	bool Keys[1024];
+private:
 	unsigned int Width, Height;
-	// constructor/destructor
-   public:
+
+public:
+	bool Keys[1024];
 	Game(unsigned int width, unsigned int height);
 	~Game();
 	// initialize game state (load all shaders/textures/levels)

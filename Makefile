@@ -1,4 +1,4 @@
-TARGET_EXEC := game
+TARGET_EXEC := phys-sim
 CXX:=g++
 INC_DIR:=include/
 CXXFLAGS:=-I$(INC_DIR) -Wall -Wextra -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
@@ -18,7 +18,7 @@ OBJS := $(_OBJS:%=$(OBJ_DIR)/%)
 
 
 $(TARGET_EXEC): $(OBJS) $(GLAD_OBJ)
-	$(CXX) -o $(TARGET_EXEC) $^ $(CXXFLAGS)
+	$(CXX) -o $@ $^ $(CXXFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp obj
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
@@ -28,4 +28,4 @@ obj:
 
 # compiles the glad library
 $(GLAD_OBJ): $(GLAD_SRC) 
-	g++ -I$(INC_DIR) $(GLAD_SRC) -o $(GLAD_OBJ) -c
+	$(CXX) -I$(INC_DIR) $(GLAD_SRC) -o $(GLAD_OBJ) -c
