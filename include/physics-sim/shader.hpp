@@ -26,7 +26,7 @@ public:
 	// geometry source code is optional
 	void Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr);
 	// utility functions
-	unsigned int getID() { return ID; }
+	GLuint getID() { return ID; }
 	void SetFloat(const char *name, float value, bool useShader = false);
 	void SetInteger(const char *name, int value, bool useShader = false);
 	void SetVector2f(const char *name, float x, float y, bool useShader = false);
