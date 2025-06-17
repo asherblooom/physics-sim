@@ -23,9 +23,9 @@ Shader ResourceManager::LoadShader(std::string name, const char *vShaderFile, co
 		std::ifstream vertexShaderFile{vShaderFile};
 		std::ifstream fragmentShaderFile{fShaderFile};
 		if (!vertexShaderFile)
-			std::cout << "no vertex shader" << std::endl;
+			std::cout << "ERROR::SHADER: Vertex shader file not found" << std::endl;
 		if (!fragmentShaderFile)
-			std::cout << "no fragment shader" << std::endl;
+			std::cout << "ERROR::SHADER: Fragment shader file not found" << std::endl;
 
 		std::stringstream vShaderStream, fShaderStream;
 		// read file's buffer contents into streams
@@ -41,7 +41,7 @@ Shader ResourceManager::LoadShader(std::string name, const char *vShaderFile, co
 		if (gShaderFile != nullptr) {
 			std::ifstream geometryShaderFile(gShaderFile);
 			if (!geometryShaderFile)
-				std::cout << "no geometry shader" << std::endl;
+				std::cout << "ERROR::SHADER: Geometry shader file not found" << std::endl;
 			std::stringstream gShaderStream;
 			gShaderStream << geometryShaderFile.rdbuf();
 			geometryShaderFile.close();
