@@ -1,6 +1,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <physics-sim/resource_manager.hpp>
+#include <physics-sim/sprite-renderer.hpp>
+
 class Game {
 private:
 	unsigned int Width, Height;

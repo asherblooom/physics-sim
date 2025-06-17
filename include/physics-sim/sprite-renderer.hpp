@@ -20,7 +20,7 @@ private:
 	// Render state
 	Shader shader;
 	unsigned int quadVAO;
-	// Initializes and configures the quad's buffer and vertex attributes
+	// Initializes and configures quadVAO
 	void initRenderData();
 };
 
