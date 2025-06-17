@@ -2,7 +2,7 @@
 #define GAME_HPP
 
 #include <physics-sim/resource_manager.hpp>
-#include <physics-sim/sprite-renderer.hpp>
+#include <physics-sim/sprite_renderer.hpp>
 
 class Game {
 private:
