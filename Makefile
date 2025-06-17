@@ -16,11 +16,14 @@ _OBJS := $(patsubst %.cpp,%.o,$(notdir $(SRCS)))
 # add the object directory to the front of the object files
 OBJS := $(_OBJS:%=$(OBJ_DIR)/%)
 
+.PHONY: main
+
+main: obj $(TARGET_EXEC)
 
 $(TARGET_EXEC): $(OBJS) $(GLAD_OBJ)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp obj
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
 
 obj: 
@@ -28,4 +31,12 @@ obj:
 
 # compiles the glad library
 $(GLAD_OBJ): $(GLAD_SRC) 
-	$(CXX) -I$(INC_DIR) $(GLAD_SRC) -o $(GLAD_OBJ) -c
+	$(CXX) -I$(INC_DIR) $< -o $@ -c
+
+
+.PHONY: clean
+
+clean:
+	rm -rf $(OBJ_DIR) $(TARGET_EXEC)
+
+
