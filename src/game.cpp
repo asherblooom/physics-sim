@@ -1,7 +1,9 @@
+#include <physics-sim/ball.hpp>
 #include <physics-sim/game.hpp>
 #include <physics-sim/phys_object.hpp>
+#include "physics-sim/object_manager.hpp"
 
-SpriteRenderer *spriteRenderer;
+SpriteRenderer* spriteRenderer;
 
 Game::Game(unsigned int width, unsigned int height)
 	: Width(width), Height(height), Keys() {
@@ -22,13 +24,13 @@ void Game::Init() {
 	// set render-specific controls
 	spriteRenderer = new SpriteRenderer(spriteShader);
 	// load textures
-	ResourceManager::LoadTexture("face", "textures/results.dds", true);
+	ResourceManager::LoadTexture("ball", "textures/awesomeface.dds", true);
 }
 
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
 		// add ball
-		PhysObject ball = new PhysObject(startingPos, ballSize, balltex, randomColor, startingVelocity);
+		ObjectManager::addObject<Ball>("ball1", glm::vec2(960, 100), glm::vec3(1, 1, 1), glm::vec2(0, 10));
 	}
 }
 
@@ -36,6 +38,5 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-	Texture2D face = ResourceManager::GetTexture("face");
-	spriteRenderer->DrawSprite(face, glm::vec2(500.0f, 500.0f), glm::vec2(300.0f, 400.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	ObjectManager::renderObjects(*spriteRenderer);
 }
