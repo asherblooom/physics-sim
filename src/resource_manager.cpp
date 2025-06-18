@@ -60,8 +60,7 @@ Shader ResourceManager::LoadShader(std::string name, const char *vShaderFile, co
 	return shader;
 }
 
-//TODO: include alpha???
-Texture2D ResourceManager::LoadTexture(std::string name, const char *file, bool alpha) {
+Texture2D ResourceManager::LoadTexture(std::string name, const char *file) {
 	unsigned char *header;
 
 	unsigned int width;
