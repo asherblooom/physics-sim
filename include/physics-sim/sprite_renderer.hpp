@@ -1,6 +1,6 @@
 
-#ifndef SPRITE_RENDERER_H
-#define SPRITE_RENDERER_H
+#ifndef SPRITE_RENDERER_HPP
+#define SPRITE_RENDERER_HPP
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
