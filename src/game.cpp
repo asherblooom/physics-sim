@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <cstring>
 #include <physics-sim/ball.hpp>
 #include <physics-sim/game.hpp>
@@ -25,13 +26,15 @@ void Game::Init() {
 	// set render-specific controls
 	spriteRenderer = new SpriteRenderer(spriteShader);
 	// load textures
-	ResourceManager::LoadTexture("ball", "textures/awesomeface.dds");
+	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 }
 
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
-		// add ball
-		auto ball1 = ObjectManager::addObject<Ball>(glm::vec2(960, 100), glm::vec3(1, 1, 1), glm::vec2(0, 10));
+		// add ballr = ((double) rand() / (RAND_MAX)) + 1
+		auto ball1 = ObjectManager::addObject<Ball>(glm::vec2(960, 100),
+													glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
+													glm::vec2(0, 5));
 		// only want one ball per key press
 		Keys[GLFW_KEY_N] = false;
 	}

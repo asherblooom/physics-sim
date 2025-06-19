@@ -3,7 +3,7 @@
 
 Ball::Ball(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity)
 	: PhysObject{pos,
-				 glm::vec2(100, 100),
+				 glm::vec2(50, 50),
 				 ResourceManager::GetTexture("ball"),
 				 color,
 				 velocity} {}
