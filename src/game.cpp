@@ -32,6 +32,7 @@ void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
 		// add ball
 		auto ball1 = ObjectManager::addObject<Ball>(glm::vec2(960, 100), glm::vec3(1, 1, 1), glm::vec2(0, 10));
+		Keys[GLFW_KEY_N] = false;
 	}
 }
 
