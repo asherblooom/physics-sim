@@ -4,7 +4,6 @@
 #include <memory>
 #include <physics-sim/phys_object.hpp>
 #include <physics-sim/sprite_renderer.hpp>
-#include <string>
 #include <vector>
 
 class ObjectManager {
