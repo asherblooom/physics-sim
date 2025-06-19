@@ -1,3 +1,4 @@
+#include <iostream>
 #include <physics-sim/ball.hpp>
 #include <physics-sim/game.hpp>
 #include <physics-sim/object_manager.hpp>
@@ -30,11 +31,15 @@ void Game::Init() {
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
 		// add ball
-		std::shared_ptr<PhysObject> ball1 = ObjectManager::addObject<Ball>("ball1", glm::vec2(960, 100), glm::vec3(1, 1, 1), glm::vec2(0, 10));
+		auto ball1 = ObjectManager::addObject<Ball>("ball1", glm::vec2(960, 100), glm::vec3(1, 1, 1), glm::vec2(0, 10));
 	}
 }
 
+//TODO: make movement fps independent!!!
 void Game::Update(float dt) {
+	auto ball1(ObjectManager::getObject("ball1"));
+	if (!ball1) return;
+	ball1->Position += ball1->Velocity;
 }
 
 void Game::Render() {
