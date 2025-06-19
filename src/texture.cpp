@@ -1,8 +1,8 @@
 #include <physics-sim/texture.hpp>
 
-Texture2D::Texture2D()
-	: Width(0), Height(0), Internal_Format(0), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_LINEAR_MIPMAP_LINEAR), Filter_Max(GL_LINEAR) {
-	glGenTextures(1, &this->ID);
+Texture2D::Texture2D(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data) {
+	glGenTextures(1, &ID_);
+	Generate(width, height, format, mipMapCount, blockSize, data);
 }
 
 void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data) {
@@ -11,7 +11,7 @@ void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int f
 	this->Internal_Format = format;
 	// bind the texture
 	// make it complete by specifying all needed parameters and ensuring all mipmaps are filled
-	glBindTexture(GL_TEXTURE_2D, this->ID);
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);	// opengl likes array length of mipmaps
 
@@ -47,5 +47,5 @@ void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int f
 }
 
 void Texture2D::Bind() const {
-	glBindTexture(GL_TEXTURE_2D, this->ID);
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
 }

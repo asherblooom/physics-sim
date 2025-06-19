@@ -1,7 +1,6 @@
 #include <physics-sim/sprite_renderer.hpp>
 
-SpriteRenderer::SpriteRenderer(Shader &shader) {
-	this->shader = shader;
+SpriteRenderer::SpriteRenderer(Shader &shader) : shader{shader} {
 	this->initRenderData();
 }
 
@@ -11,7 +10,7 @@ SpriteRenderer::~SpriteRenderer() {
 
 void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color) {
 	// prepare transformations
-	this->shader.Use();
+	shader.Use();
 	glm::mat4 model = glm::mat4(1.0f);
 	// first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
 	model = glm::translate(model, glm::vec3(position, 0.0f));

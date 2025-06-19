@@ -8,7 +8,7 @@
 
 class ObjectManager {
 private:
-	static std::vector<std::shared_ptr<PhysObject>> Objects;
+	static std::vector<std::unique_ptr<PhysObject>> Objects;
 	// singleton class
 	ObjectManager() {}
 
@@ -16,19 +16,14 @@ public:
 	//TODO: is it possible to get this in the cpp file? I'm not sure...
 	template <typename Obj>
 		requires std::is_base_of_v<PhysObject, Obj>
-	static std::shared_ptr<PhysObject> addObject(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
-		std::shared_ptr<PhysObject> object = std::make_shared<Obj>(pos, color, velocity);
-		Objects.push_back(object);
-		return object;
+	static const PhysObject& addObject(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
+		Objects.push_back(std::make_unique<Obj>(pos, color, velocity));
+		return *Objects.back();
 	}
 
-	static void deleteObject(int index) {
-		Objects.erase(Objects.begin() + index);
-	}
+	static void deleteObject(int index) { Objects.erase(Objects.begin() + index); }
 
-	static std::vector<std::shared_ptr<PhysObject>> getObjects() {
-		return Objects;
-	}
+	static const std::vector<std::unique_ptr<PhysObject>>& getObjects() { return Objects; }
 
 	static void renderObjects(SpriteRenderer& renderer);
 };

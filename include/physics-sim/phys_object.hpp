@@ -11,16 +11,15 @@
 // minimal of state as described within PhysObject.
 class PhysObject {
 public:
-	glm::vec2 Position, Size, Velocity;
 	glm::vec3 Color;
-	float Rotation;
-	bool Destroyed;
-
-	Texture2D Texture;
-
 	void Draw(SpriteRenderer &renderer);
+	void AddForce(glm::vec2 force) { Force += force; }
 
 protected:
+	glm::vec2 Position, Size, Velocity, Force;
+	float Rotation;
+	bool Destroyed;
+	Texture2D Texture;
 	PhysObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f),
 			   glm::vec2 velocity = glm::vec2(0.0f, 0.0f));
 };
