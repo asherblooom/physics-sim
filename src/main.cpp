@@ -11,7 +11,7 @@ const unsigned int SCR_HEIGHT = 1080;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-Game physSim(SCR_WIDTH, SCR_HEIGHT);
+Game* physSim = new Game(SCR_WIDTH, SCR_HEIGHT);
 
 int main() {
 	// Initialise glfw and set options
@@ -43,7 +43,7 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetKeyCallback(window, key_callback);
 
-	physSim.Init();
+	physSim->Init();
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -59,22 +59,21 @@ int main() {
 
 		// manage user input
 		// -----------------
-		physSim.ProcessInput(deltaTime);
+		physSim->ProcessInput(deltaTime);
 
 		// update game state
 		// -----------------
-		physSim.Update(deltaTime);
+		physSim->Update(deltaTime);
 
 		// render
 		// ------
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		physSim.Render();
+		physSim->Render();
 
 		glfwSwapBuffers(window);
 	}
-
-	ResourceManager::Clear();
+	delete physSim;
 	glfwTerminate();
 	return 0;
 }
@@ -91,8 +90,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 	if (key >= 0 && key < 1024) {
 		if (action == GLFW_PRESS)
-			physSim.Keys[key] = true;
+			physSim->Keys[key] = true;
 		else if (action == GLFW_RELEASE)
-			physSim.Keys[key] = false;
+			physSim->Keys[key] = false;
 	}
 }

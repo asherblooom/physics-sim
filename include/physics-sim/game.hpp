@@ -12,11 +12,24 @@
 class Game {
 private:
 	unsigned int Width, Height;
+	SpriteRenderer* Renderer;
+	std::vector<std::unique_ptr<PhysObject>> Objects;
+
+	template <typename Obj>
+		requires std::is_base_of_v<PhysObject, Obj>
+	PhysObject& addObject(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
+		std::unique_ptr<PhysObject> obj = std::make_unique<Obj>(pos, color, velocity);
+		Objects.push_back(std::move(obj));
+		return *Objects.back();
+	}
 
 public:
 	bool Keys[1024];
 	Game(unsigned int width, unsigned int height);
-	~Game();
+	~Game() {
+		delete Renderer;
+		ResourceManager::Clear();
+	}
 	// initialize game state (load all shaders/textures/levels)
 	void Init();
 	// game loop

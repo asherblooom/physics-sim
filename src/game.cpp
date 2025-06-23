@@ -4,22 +4,8 @@
 #include <cstring>
 #include <memory>
 
-SpriteRenderer* SpriteRenderer;
-std::vector<std::unique_ptr<PhysObject>> Objects;
-
 Game::Game(unsigned int width, unsigned int height)
 	: Width(width), Height(height), Keys() {
-}
-Game::~Game() {
-	delete SpriteRenderer;
-}
-
-template <typename Obj>
-	requires std::is_base_of_v<PhysObject, Obj>
-PhysObject& addObject(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
-	std::unique_ptr<PhysObject> obj = std::make_unique<Obj>(pos, color, velocity);
-	Objects.push_back(std::move(obj));
-	return *Objects.back();
 }
 
 void Game::Init() {
@@ -32,7 +18,7 @@ void Game::Init() {
 	spriteShader.SetInteger("image", 0);
 	spriteShader.SetMatrix4("projection", projection);
 	// set render-specific controls
-	SpriteRenderer = new class ::SpriteRenderer(spriteShader);
+	Renderer = new SpriteRenderer(spriteShader);
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/awesomeface.dds");
 }
@@ -63,8 +49,8 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-	// ObjectManager::RenderObjects(*spriteRenderer);
+	// ObjectManager::RenderObjects(*Renderer);
 	for (auto& object : Objects) {
-		object->Draw(*SpriteRenderer);
+		object->Draw(*Renderer);
 	}
 }
