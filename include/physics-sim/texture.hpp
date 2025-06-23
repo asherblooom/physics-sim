@@ -9,8 +9,8 @@ class Texture2D {
 private:
 	// holds the ID of the texture object, used for all texture operations to reference to this particular texture
 	GLuint ID_;
-	unsigned int Width, Height;	   // width and height of loaded image in pixels
-	unsigned int Internal_Format;  // format of texture object
+	unsigned int width, height;	  // width and height of loaded image in pixels
+	unsigned int internalFormat;  // format of texture object
 
 public:
 	Texture2D();

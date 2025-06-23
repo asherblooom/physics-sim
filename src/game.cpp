@@ -5,20 +5,20 @@
 #include <memory>
 
 Game::Game(unsigned int width, unsigned int height)
-	: Width(width), Height(height), Keys() {
+	: width(width), height(height), Keys() {
 }
 
 void Game::Init() {
 	// load shaders
 	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vs", "src/shaders/sprite.frag");
 	// configure shaders
-	glm::mat4 projection = glm::ortho(0.0f, (float)(this->Width), (float)(this->Height), 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)(this->width), (float)(this->height), 0.0f, -1.0f, 1.0f);
 	Shader& spriteShader = ResourceManager::GetShader("sprite");
 	spriteShader.Use();
 	spriteShader.SetInteger("image", 0);
 	spriteShader.SetMatrix4("projection", projection);
 	// set render-specific controls
-	Renderer = new SpriteRenderer(spriteShader);
+	renderer = new SpriteRenderer(spriteShader);
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/awesomeface.dds");
 }
@@ -40,7 +40,7 @@ void Game::ProcessInput(float dt) {
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
 	// move balls down
-	for (auto& object : Objects) {
+	for (auto& object : objects) {
 		if (std::strcmp(typeid(object).name(), "Ball")) {
 			// if ((object->Position + object->Velocity).y >= 1000.0f) continue;
 			// object->Position += object->Velocity;
@@ -50,7 +50,7 @@ void Game::Update(float dt) {
 
 void Game::Render() {
 	// ObjectManager::RenderObjects(*Renderer);
-	for (auto& object : Objects) {
-		object->Draw(*Renderer);
+	for (auto& object : objects) {
+		object->Draw(*renderer);
 	}
 }

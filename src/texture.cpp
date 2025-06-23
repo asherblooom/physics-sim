@@ -36,9 +36,9 @@ void Texture2D::Filter_Max(unsigned int filter_max) {
 }
 
 void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data) {
-	this->Width = width;
-	this->Height = height;
-	this->Internal_Format = format;
+	this->width = width;
+	this->height = height;
+	this->internalFormat = format;
 	// bind the texture
 	// make it complete by specifying all needed parameters and ensuring all mipmaps are filled
 	glBindTexture(GL_TEXTURE_2D, this->ID_);
@@ -48,8 +48,8 @@ void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int f
 	// prepare some variables
 	unsigned int offset = 0;
 	unsigned int size = 0;
-	unsigned int w = this->Width;
-	unsigned int h = this->Height;
+	unsigned int w = this->width;
+	unsigned int h = this->height;
 
 	// loop through sending block at a time with the magic formula
 	// upload to opengl properly, note the offset transverses the pointer
@@ -60,7 +60,7 @@ void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int f
 			continue;
 		}
 		size = ((w + 3) / 4) * ((h + 3) / 4) * blockSize;
-		glCompressedTexImage2D(GL_TEXTURE_2D, i, this->Internal_Format, w, h, 0, size, data + offset);
+		glCompressedTexImage2D(GL_TEXTURE_2D, i, this->internalFormat, w, h, 0, size, data + offset);
 		offset += size;
 		w /= 2;
 		h /= 2;
