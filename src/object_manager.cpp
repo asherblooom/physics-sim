@@ -2,7 +2,7 @@
 
 std::vector<std::unique_ptr<PhysObject>> ObjectManager::Objects;
 
-void ObjectManager::renderObjects(SpriteRenderer& renderer) {
+void ObjectManager::RenderObjects(SpriteRenderer& renderer) {
 	for (auto& object : Objects) {
 		object->Draw(renderer);
 	}

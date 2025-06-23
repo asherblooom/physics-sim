@@ -4,6 +4,7 @@
 #include <physics-sim/game.hpp>
 #include <physics-sim/object_manager.hpp>
 #include <physics-sim/phys_object.hpp>
+#include "physics-sim/resource_manager.hpp"
 
 SpriteRenderer* spriteRenderer;
 
@@ -19,7 +20,7 @@ void Game::Init() {
 	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vs", "src/shaders/sprite.frag");
 	// configure shaders
 	glm::mat4 projection = glm::ortho(0.0f, (float)(this->Width), (float)(this->Height), 0.0f, -1.0f, 1.0f);
-	Shader spriteShader = ResourceManager::GetShader("sprite");
+	Shader& spriteShader = ResourceManager::GetShader("sprite");
 	spriteShader.Use();
 	spriteShader.SetInteger("image", 0);
 	spriteShader.SetMatrix4("projection", projection);
@@ -31,7 +32,7 @@ void Game::Init() {
 
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
-		auto ball1 = ObjectManager::addObject<Ball>(glm::vec2(960, 100),
+		auto ball1 = ObjectManager::AddObject<Ball>(glm::vec2(960, 100),
 													glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
 													glm::vec2(0, 5));
 		// only want one ball per key press
@@ -42,7 +43,7 @@ void Game::ProcessInput(float dt) {
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
 	// move balls down
-	for (auto& object : ObjectManager::getObjects()) {
+	for (auto& object : ObjectManager::GetObjects()) {
 		if (std::strcmp(typeid(object).name(), "Ball")) {
 			// if ((object->Position + object->Velocity).y >= 1000.0f) continue;
 			// object->Position += object->Velocity;
@@ -51,5 +52,5 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-	ObjectManager::renderObjects(*spriteRenderer);
+	ObjectManager::RenderObjects(*spriteRenderer);
 }

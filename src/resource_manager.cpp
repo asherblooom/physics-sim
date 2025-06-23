@@ -9,11 +9,11 @@
 std::map<std::string, Shader> ResourceManager::Shaders;
 std::map<std::string, Texture2D> ResourceManager::Textures;
 
-const Shader &ResourceManager::GetShader(std::string name) {
+Shader &ResourceManager::GetShader(std::string name) {
 	return Shaders[name];
 }
 
-const Shader &ResourceManager::LoadShader(std::string name, const char *vShaderFile, const char *fShaderFile, const char *gShaderFile) {
+Shader &ResourceManager::LoadShader(std::string name, const char *vShaderFile, const char *fShaderFile, const char *gShaderFile) {
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
 	std::string fragmentCode;
@@ -60,7 +60,7 @@ const Shader &ResourceManager::LoadShader(std::string name, const char *vShaderF
 	return Shaders[name];
 }
 
-const Texture2D &ResourceManager::LoadTexture(std::string name, const char *file) {
+Texture2D &ResourceManager::LoadTexture(std::string name, const char *file) {
 	// allocate new unsigned char space with 4 (file code) + 124 (header size) bytes
 	unsigned char *header = new unsigned char[128];
 
@@ -149,7 +149,7 @@ const Texture2D &ResourceManager::LoadTexture(std::string name, const char *file
 	}
 }
 
-const Texture2D &ResourceManager::GetTexture(std::string name) {
+Texture2D &ResourceManager::GetTexture(std::string name) {
 	return Textures[name];
 }
 
