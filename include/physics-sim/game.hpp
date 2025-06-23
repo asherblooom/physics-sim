@@ -1,6 +1,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <physics-sim/ball.hpp>
+#include <physics-sim/object_manager.hpp>
+#include <physics-sim/phys_object.hpp>
 #include <physics-sim/resource_manager.hpp>
 #include <physics-sim/sprite_renderer.hpp>
 
