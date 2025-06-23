@@ -13,7 +13,6 @@ private:
 	ObjectManager() {}
 
 public:
-	//TODO: is it possible to get this in the cpp file? I'm not sure...
 	template <typename Obj>
 		requires std::is_base_of_v<PhysObject, Obj>
 	static const PhysObject& addObject(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {

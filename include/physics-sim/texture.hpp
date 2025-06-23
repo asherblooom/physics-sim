@@ -11,20 +11,19 @@ private:
 	GLuint ID_;
 	unsigned int Width, Height;	   // width and height of loaded image in pixels
 	unsigned int Internal_Format;  // format of texture object
-	// texture configuration
-	unsigned int Wrap_S;	  // wrapping mode on S axis
-	unsigned int Wrap_T;	  // wrapping mode on T axis
-	unsigned int Filter_Min;  // filtering mode if texture pixels < screen pixels
-	unsigned int Filter_Max;  // filtering mode if texture pixels > screen pixels
-
-	void Generate(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data);
 
 public:
-	const GLuint& ID() const { return ID_; }
+	Texture2D();
 	// generates texture from image data
-	Texture2D(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data);
+	void Generate(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data);
 	// binds the texture as the current active GL_TEXTURE_2D texture object
 	void Bind() const;
+	const GLuint& ID() const { return ID_; }
+	// texture configuration
+	void Wrap_S(unsigned int wrap_s);		   // set wrapping mode on S axis
+	void Wrap_T(unsigned int wrap_t);		   // set wrapping mode on T axis
+	void Filter_Min(unsigned int filter_min);  // set filtering mode if texture pixels < screen pixels
+	void Filter_Max(unsigned int filter_max);  // set filtering mode if texture pixels > screen pixels
 };
 
 #endif

@@ -10,7 +10,7 @@ std::map<std::string, Shader> ResourceManager::Shaders;
 std::map<std::string, Texture2D> ResourceManager::Textures;
 
 const Shader &ResourceManager::GetShader(std::string name) {
-	return Shaders.find(name)->second;
+	return Shaders[name];
 }
 
 const Shader &ResourceManager::LoadShader(std::string name, const char *vShaderFile, const char *fShaderFile, const char *gShaderFile) {
@@ -54,8 +54,10 @@ const Shader &ResourceManager::LoadShader(std::string name, const char *vShaderF
 	const char *fShaderCode = fragmentCode.c_str();
 	const char *gShaderCode = geometryCode.c_str();
 	// 2. now create shader object from source code
-	Shaders.emplace(name, Shader(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr));
-	return Shaders.find(name)->second;
+	Shader shader;
+	shader.Compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr);
+	Shaders[name] = shader;
+	return Shaders[name];
 }
 
 const Texture2D &ResourceManager::LoadTexture(std::string name, const char *file) {
@@ -130,12 +132,14 @@ const Texture2D &ResourceManager::LoadTexture(std::string name, const char *file
 		fread(buffer, 1, file_size, f);
 
 		// now generate texture
-		Textures.emplace(name, Texture2D(width, height, format, mipMapCount, blockSize, buffer));
+		Texture2D texture;
+		texture.Generate(width, height, format, mipMapCount, blockSize, buffer);
+		Textures[name] = texture;
 
 		delete[] (buffer);
 		delete[] (header);
 		fclose(f);
-		return Textures.find(name)->second;
+		return Textures[name];
 
 	} catch (const char *e) {
 		delete[] (buffer);
@@ -146,17 +150,17 @@ const Texture2D &ResourceManager::LoadTexture(std::string name, const char *file
 }
 
 const Texture2D &ResourceManager::GetTexture(std::string name) {
-	return Textures.find(name)->second;
+	return Textures[name];
 }
 
 void ResourceManager::Clear() {
 	// (properly) delete all shaders
-	for (auto shader : Shaders) {
+	for (auto &shader : Shaders) {
 		glDeleteProgram(shader.second.ID());
 	}
 
 	// (properly) delete all textures
-	for (auto texture : Textures) {
+	for (auto &texture : Textures) {
 		glDeleteTextures(1, &texture.second.ID());
 	}
 }

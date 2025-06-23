@@ -1,11 +1,6 @@
 #include <iostream>
 #include <physics-sim/shader.hpp>
 
-Shader::Shader(const char *vertexSource, const char *fragmentSource, const char *geometrySource)
-	: ID_{glCreateProgram()} {
-	Compile(vertexSource, fragmentSource, geometrySource);
-}
-
 void Shader::Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource) {
 	GLuint vertex_shader, fragment_shader, geometry_shader;
 

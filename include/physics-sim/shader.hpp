@@ -18,10 +18,10 @@ enum ShaderType {
 // and hosts several utility functions for easy management.
 class Shader {
 public:
-	// constructor; will create a program and
+	Shader() : ID_{glCreateProgram()} {}
 	// will compile and link the shaders from given source code
 	// geometry source code is optional
-	Shader(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr);
+	void Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr);
 	// sets the current shaders as active
 	void Use() { glUseProgram(this->ID_); }
 	// utility functions
@@ -39,7 +39,6 @@ public:
 private:
 	// program id
 	GLuint ID_;
-	void Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr);
 	// checks if compilation or linking failed and if so, print the error logs
 	void checkCompileErrors(GLuint object, ShaderType type);
 };

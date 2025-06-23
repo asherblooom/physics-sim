@@ -1,8 +1,38 @@
 #include <physics-sim/texture.hpp>
 
-Texture2D::Texture2D(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data) {
+Texture2D::Texture2D() {
 	glGenTextures(1, &ID_);
-	Generate(width, height, format, mipMapCount, blockSize, data);
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
+	// defaults
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::Wrap_S(unsigned int wrap_s) {
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::Wrap_T(unsigned int wrap_t) {
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::Filter_Min(unsigned int filter_min) {
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::Filter_Max(unsigned int filter_max) {
+	glBindTexture(GL_TEXTURE_2D, this->ID_);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_max);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int format, unsigned int mipMapCount, unsigned int blockSize, unsigned char* data) {
@@ -14,11 +44,6 @@ void Texture2D::Generate(unsigned int width, unsigned int height, unsigned int f
 	glBindTexture(GL_TEXTURE_2D, this->ID_);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMapCount - 1);	// opengl likes array length of mipmaps
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->Wrap_S);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->Wrap_T);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->Filter_Min);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->Filter_Max);
 
 	// prepare some variables
 	unsigned int offset = 0;
