@@ -5,6 +5,8 @@
 #include <cstring>
 #include "physics-sim/ball.hpp"
 
+//TODO: scale variable!
+
 Game::Game(unsigned int width, unsigned int height)
 	: width(width), height(height), Keys(), MousePos(glm::vec2(0)) {
 }

@@ -40,7 +40,9 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	// set initial viewport
+	framebuffer_size_callback(window, SCR_WIDTH, SCR_HEIGHT);
+
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetKeyCallback(window, key_callback);
 
@@ -82,7 +84,22 @@ int main() {
 
 // callback for updating window size
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
+	float gameAspectRatio = 16.0f / 9.0f;
+	float windowAspectRatio = float(width) / float(height);
+	if (windowAspectRatio < gameAspectRatio) {
+		// need black bars top and bottom to preserve game aspect ratio
+		float heightRange = width * (1 / gameAspectRatio);
+		float heightOffset = (height - heightRange) / 2;
+		glViewport(0, heightOffset, width, height - heightOffset * 2);
+
+	} else if (windowAspectRatio > gameAspectRatio) {
+		// need black bars left and right to preserve game aspect ratio
+		float widthRange = height * gameAspectRatio;
+		float widthOffset = (width - widthRange) / 2;
+		glViewport(widthOffset, 0, width - widthOffset * 2, height);
+
+	} else
+		glViewport(0, 0, width, height);
 }
 
 // callback for processing input
@@ -99,17 +116,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 glm::vec2 getMousePos(GLFWwindow* window) {
-	// Get cursor coördinates relative to the window's top-left corner.
+	// Get cursor coordinates relative to the window's top-left corner.
 	double relativeCursorX = 0.0;
 	double relativeCursorY = 0.0;
 	glfwGetCursorPos(window, &relativeCursorX, &relativeCursorY);
 
-	// Get the coördinates of the window's top-left corner (relative to the top-left of the screen).
+	// Get the coordinates of the window's top-left corner (relative to the top-left of the screen).
 	int windowTopLeftX = 0;
 	int windowTopLeftY = 0;
 	glfwGetWindowPos(window, &windowTopLeftX, &windowTopLeftY);
 
-	// Get the absolute coördinates of the cursor by combining the window and relative cursor coördinates.
+	// Get the absolute coordinates of the cursor by combining the window and relative cursor coordinates.
 	const int absoluteCursorX = windowTopLeftX + static_cast<int>(std::floor(relativeCursorX));
 	const int absoluteCursorY = windowTopLeftY + static_cast<int>(std::floor(relativeCursorY));
 
