@@ -1,27 +1,22 @@
-#ifndef GAMEOBJECT_HPP
-#define GAMEOBJECT_HPP
+//TODO: add a object type enum etc. ?
+#ifndef PHYSOBJECT_HPP
+#define PHYSOBJECT_HPP
 
 #include <glm/glm.hpp>
 
+#include <physics-sim/game_object.hpp>
 #include <physics-sim/sprite_renderer.hpp>
 #include <physics-sim/texture.hpp>
 
-// Container object for holding all state relevant for a single
-// physics object entity. Each object in the game likely needs the
-// minimal of state as described within PhysObject.
-class PhysObject {
+// an object that can be manipulated by the physics engine
+class PhysObject : public GameObject {
 public:
-	glm::vec3 Color;
-	void Draw(SpriteRenderer &renderer);
 	void AddForce(glm::vec2 force) { this->force += force; }
+	PhysObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f),
+			   glm::vec2 velocity = glm::vec2(0.0f));
 
 protected:
-	glm::vec2 position, size, velocity, force;
-	float rotation;
-	bool destroyed;
-	Texture2D texture;
-	PhysObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f),
-			   glm::vec2 velocity = glm::vec2(0.0f, 0.0f));
+	glm::vec2 velocity, force;
 };
 
 #endif
