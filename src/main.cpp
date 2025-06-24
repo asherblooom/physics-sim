@@ -3,9 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <physics-sim/game.hpp>
-#include <physics-sim/resource_manager.hpp>
-#include "glm/detail/func_matrix.hpp"
-#include "glm/detail/type_mat.hpp"
 
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
@@ -84,24 +81,36 @@ int main() {
 	return 0;
 }
 
-// callback for updating window size
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+// calculates the boundaries of the screen space needed to maintain a constant aspect ratio and keep everything displayed
+auto calculateRenderBounds(int windowWidth, int windowHeight) {
+	struct bounds {
+		float x;
+		float y;
+		float width;
+		float height;
+	};
 	float gameAspectRatio = 16.0f / 9.0f;
-	float windowAspectRatio = float(width) / float(height);
+	float windowAspectRatio = float(windowWidth) / float(windowHeight);
 	if (windowAspectRatio < gameAspectRatio) {
 		// need black bars top and bottom to preserve game aspect ratio
-		float heightRange = width * (1 / gameAspectRatio);
-		float heightOffset = (height - heightRange) / 2;
-		glViewport(0, heightOffset, width, height - heightOffset * 2);
+		float heightRange = windowWidth * (1 / gameAspectRatio);
+		float heightOffset = (windowHeight - heightRange) / 2;
+		return bounds{0, heightOffset, (float)windowWidth, windowHeight - heightOffset * 2};
 
 	} else if (windowAspectRatio > gameAspectRatio) {
 		// need black bars left and right to preserve game aspect ratio
-		float widthRange = height * gameAspectRatio;
-		float widthOffset = (width - widthRange) / 2;
-		glViewport(widthOffset, 0, width - widthOffset * 2, height);
+		float widthRange = windowHeight * gameAspectRatio;
+		float widthOffset = (windowWidth - widthRange) / 2;
+		return bounds{widthOffset, 0, windowWidth - widthOffset * 2, (float)windowHeight};
 
 	} else
-		glViewport(0, 0, width, height);
+		return bounds{0, 0, (float)windowWidth, (float)windowHeight};
+}
+
+// callback for updating window size
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	auto [x, y, gameWidth, gameHeight] = calculateRenderBounds(width, height);
+	glViewport(x, y, gameWidth, gameHeight);
 }
 
 // callback for processing input
@@ -120,18 +129,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 const glm::vec2 getMousePos(GLFWwindow* window) {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
+	auto [x, y, gameWidth, gameHeight] = calculateRenderBounds(width, height);
 
-	// Get cursor coordinates relative to the window's top-left corner.
-	double relativeCursorX, relativeCursorY;
-	glfwGetCursorPos(window, &relativeCursorX, &relativeCursorY);
-	auto cursorPos = glm::vec2(relativeCursorX, relativeCursorY);
+	double cursorX, cursorY;
+	glfwGetCursorPos(window, &cursorX, &cursorY);
 
-	//TODO: fixme
 	//transform coordinates from screen space into world space
-	glm::mat4 projection = glm::ortho(0.0f, (float)(width), (float)(height), 0.0f, -1.0f, 1.0f);
-	auto projectionInv = glm::inverse(projection);
-	glm::vec4 transformedCursor = projectionInv * glm::vec4(cursorPos.x, cursorPos.y, 0, 1);
 
-	// return glm::vec2(absoluteCursorX, absoluteCursorY);
-	return glm::vec2(transformedCursor.x, transformedCursor.y);
+	//move top left to match beginning of render area
+	cursorX = cursorX - x;
+	cursorY = cursorY - y;
+
+	//we know world space has coordinates (0, 0) to (1920, 1080)
+	double xRatio = 1920.0 / gameWidth;
+	double yRatio = 1080.0 / gameHeight;
+
+	return glm::vec2(cursorX * xRatio, cursorY * yRatio);
 }

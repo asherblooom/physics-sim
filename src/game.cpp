@@ -13,7 +13,7 @@ void Game::Init() {
 	// load shaders
 	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vs", "src/shaders/sprite.frag");
 	// configure shaders
-	glm::mat4 projection = glm::ortho(0.0f, (float)(this->width), (float)(this->height), 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)1920, (float)1080, 0.0f, -1.0f, 1.0f);
 	Shader& spriteShader = ResourceManager::GetShader("sprite");
 	spriteShader.Use();
 	spriteShader.SetInteger("image", 0);
@@ -41,7 +41,6 @@ void Game::ProcessInput(float dt) {
 
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
-	//TODO: do we need to do inverse of transformations to get pointer from screen space to world space???
 	std::cout << MousePos.x << " ";
 	for (auto& ball : balls) {
 		auto ballCenter = ball.Position() + (ball.Size / 2.0f);
