@@ -12,14 +12,17 @@
 class GameObject {
 public:
 	glm::vec3 Color;
+	const glm::vec2 Size;
+	const Texture2D Texture;
+
 	void Draw(SpriteRenderer& renderer);
 	GameObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f));
 
+	// don't write to position!
 	const glm::vec2& Position() const { return position; }
 
 protected:
-	glm::vec2 position, size;
-	Texture2D texture;
+	glm::vec2 position;
 	float rotation;
 };
 

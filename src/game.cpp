@@ -41,10 +41,11 @@ void Game::ProcessInput(float dt) {
 
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
-	//TODO: broken, doesn't account for size/radius
 	//TODO: do we need to do inverse of transformations to get pointer from screen space to world space???
 	for (auto& ball : balls) {
-		if (MousePos == ball.Position()) {
+		auto ballCenter = ball.Position() + (ball.Size / 2.0f);
+		auto distance = std::sqrt(std::pow(MousePos.x - ballCenter.x, 2) + std::pow(MousePos.y - ballCenter.y, 2));
+		if (distance <= ball.Size.x / 2.0f) {
 			ball.Color = glm::vec3(1);
 		}
 	}
