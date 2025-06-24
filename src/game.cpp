@@ -3,9 +3,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include "physics-sim/ball.hpp"
-
-//TODO: scale variable!
+#include <physics-sim/ball.hpp>
 
 Game::Game(unsigned int width, unsigned int height)
 	: width(width), height(height), Keys(), MousePos(glm::vec2(0)) {
@@ -44,6 +42,7 @@ void Game::ProcessInput(float dt) {
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
 	//TODO: do we need to do inverse of transformations to get pointer from screen space to world space???
+	std::cout << MousePos.x << " ";
 	for (auto& ball : balls) {
 		auto ballCenter = ball.Position() + (ball.Size / 2.0f);
 		auto distance = std::sqrt(std::pow(MousePos.x - ballCenter.x, 2) + std::pow(MousePos.y - ballCenter.y, 2));

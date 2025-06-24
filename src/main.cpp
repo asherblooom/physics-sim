@@ -4,13 +4,15 @@
 #include <iostream>
 #include <physics-sim/game.hpp>
 #include <physics-sim/resource_manager.hpp>
+#include "glm/detail/func_matrix.hpp"
+#include "glm/detail/type_mat.hpp"
 
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-glm::vec2 getMousePos(GLFWwindow* window);
+const glm::vec2 getMousePos(GLFWwindow* window);
 
 Game* physSim = new Game(SCR_WIDTH, SCR_HEIGHT);
 
@@ -71,7 +73,7 @@ int main() {
 
 		// render
 		// ------
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.298, 0.831, 0.941, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		physSim->Render();
 
@@ -115,20 +117,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
-glm::vec2 getMousePos(GLFWwindow* window) {
+const glm::vec2 getMousePos(GLFWwindow* window) {
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+
 	// Get cursor coordinates relative to the window's top-left corner.
-	double relativeCursorX = 0.0;
-	double relativeCursorY = 0.0;
+	double relativeCursorX, relativeCursorY;
 	glfwGetCursorPos(window, &relativeCursorX, &relativeCursorY);
+	auto cursorPos = glm::vec2(relativeCursorX, relativeCursorY);
 
-	// Get the coordinates of the window's top-left corner (relative to the top-left of the screen).
-	int windowTopLeftX = 0;
-	int windowTopLeftY = 0;
-	glfwGetWindowPos(window, &windowTopLeftX, &windowTopLeftY);
+	//TODO: fixme
+	//transform coordinates from screen space into world space
+	glm::mat4 projection = glm::ortho(0.0f, (float)(width), (float)(height), 0.0f, -1.0f, 1.0f);
+	auto projectionInv = glm::inverse(projection);
+	glm::vec4 transformedCursor = projectionInv * glm::vec4(cursorPos.x, cursorPos.y, 0, 1);
 
-	// Get the absolute coordinates of the cursor by combining the window and relative cursor coordinates.
-	const int absoluteCursorX = windowTopLeftX + static_cast<int>(std::floor(relativeCursorX));
-	const int absoluteCursorY = windowTopLeftY + static_cast<int>(std::floor(relativeCursorY));
-
-	return glm::vec2(absoluteCursorX, absoluteCursorY);
+	// return glm::vec2(absoluteCursorX, absoluteCursorY);
+	return glm::vec2(transformedCursor.x, transformedCursor.y);
 }
