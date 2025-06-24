@@ -12,8 +12,10 @@
 class GameObject {
 public:
 	glm::vec3 Color;
-	void Draw(SpriteRenderer &renderer);
+	void Draw(SpriteRenderer& renderer);
 	GameObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f));
+
+	const glm::vec2& Position() const { return position; }
 
 protected:
 	glm::vec2 position, size;

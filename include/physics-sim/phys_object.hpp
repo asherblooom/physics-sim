@@ -1,11 +1,9 @@
-//TODO: add a object type enum etc. ?
 #ifndef PHYSOBJECT_HPP
 #define PHYSOBJECT_HPP
 
 #include <glm/glm.hpp>
 
 #include <physics-sim/game_object.hpp>
-#include <physics-sim/sprite_renderer.hpp>
 #include <physics-sim/texture.hpp>
 
 // an object that can be manipulated by the physics engine

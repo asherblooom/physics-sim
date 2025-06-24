@@ -1,10 +1,12 @@
+#include <iostream>
 #include <physics-sim/game.hpp>
 
 #include <cstdlib>
 #include <cstring>
+#include "physics-sim/ball.hpp"
 
 Game::Game(unsigned int width, unsigned int height)
-	: width(width), height(height), Keys() {
+	: width(width), height(height), Keys(), MousePos(glm::vec2(0)) {
 }
 
 void Game::Init() {
@@ -39,6 +41,13 @@ void Game::ProcessInput(float dt) {
 
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
+	//TODO: broken, doesn't account for size/radius
+	//TODO: do we need to do inverse of transformations to get pointer from screen space to world space???
+	for (auto& ball : balls) {
+		if (MousePos == ball.Position()) {
+			ball.Color = glm::vec3(1);
+		}
+	}
 	// move balls down
 	for (auto& ball : balls) {
 		// if ((object->Position + object->Velocity).y >= 1000.0f) continue;
@@ -49,13 +58,13 @@ void Game::Update(float dt) {
 void Game::Render() {
 	// ObjectManager::RenderObjects(*Renderer);
 	for (auto& ball : balls) {
-		ball->Draw(*renderer);
+		ball.Draw(*renderer);
 	}
 	container->Draw(*renderer);
 }
 
 PhysObject& Game::makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
-	auto ball = std::make_unique<PhysObject>(pos, glm::vec2(50, 50), ResourceManager::GetTexture("ball"), color, velocity);
+	auto ball = Ball(pos, 1.0f, color, velocity);
 	balls.push_back(std::move(ball));
-	return *balls.back();
+	return balls.back();
 }

@@ -10,6 +10,7 @@ const unsigned int SCR_HEIGHT = 1080;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+glm::vec2 getMousePos(GLFWwindow* window);
 
 Game* physSim = new Game(SCR_WIDTH, SCR_HEIGHT);
 
@@ -63,6 +64,7 @@ int main() {
 
 		// update game state
 		// -----------------
+		physSim->MousePos = getMousePos(window);
 		physSim->Update(deltaTime);
 
 		// render
@@ -94,4 +96,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		else if (action == GLFW_RELEASE)
 			physSim->Keys[key] = false;
 	}
+}
+
+glm::vec2 getMousePos(GLFWwindow* window) {
+	// Get cursor coördinates relative to the window's top-left corner.
+	double relativeCursorX = 0.0;
+	double relativeCursorY = 0.0;
+	glfwGetCursorPos(window, &relativeCursorX, &relativeCursorY);
+
+	// Get the coördinates of the window's top-left corner (relative to the top-left of the screen).
+	int windowTopLeftX = 0;
+	int windowTopLeftY = 0;
+	glfwGetWindowPos(window, &windowTopLeftX, &windowTopLeftY);
+
+	// Get the absolute coördinates of the cursor by combining the window and relative cursor coördinates.
+	const int absoluteCursorX = windowTopLeftX + static_cast<int>(std::floor(relativeCursorX));
+	const int absoluteCursorY = windowTopLeftY + static_cast<int>(std::floor(relativeCursorY));
+
+	return glm::vec2(absoluteCursorX, absoluteCursorY);
 }

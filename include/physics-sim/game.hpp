@@ -8,19 +8,21 @@
 
 #include <GLFW/glfw3.h>
 #include <memory>
+#include <physics-sim/ball.hpp>
 #include <vector>
 
 class Game {
 private:
 	unsigned int width, height;
 	SpriteRenderer* renderer;
-	std::vector<std::unique_ptr<PhysObject>> balls;
+	std::vector<Ball> balls;
 	std::unique_ptr<PhysObject> container;
 
 	PhysObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 
 public:
 	bool Keys[1024];
+	glm::vec2 MousePos;
 	Game(unsigned int width, unsigned int height);
 	~Game() {
 		delete renderer;
