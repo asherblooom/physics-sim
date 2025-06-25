@@ -1,3 +1,4 @@
+#include <optional>
 #include <physics-sim/game.hpp>
 
 #include <GLFW/glfw3.h>
@@ -38,31 +39,34 @@ void Game::ProcessInput(float dt) {
 		Keys[GLFW_KEY_N] = false;
 	}
 	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
-	if (MouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !selectedBall.first) {
-		// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
+	// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
+	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
+		auto selctedDistance = std::sqrt(std::pow(MousePos.x - (*selectedBall)->Center.x, 2) + std::pow(MousePos.y - (*selectedBall)->Center.y, 2));
+		if (selctedDistance > (*selectedBall)->Size.x / 2.0f) {
+			(*selectedBall)->Color -= glm::vec3(0.1);
+			selectedBall.reset();
+		}
+	}
+	if (!selectedBall) {
 		for (int i = balls.size() - 1; i >= 0; i--) {
 			Ball& ball = balls[i];
 			auto distance = std::sqrt(std::pow(MousePos.x - ball.Center.x, 2) + std::pow(MousePos.y - ball.Center.y, 2));
 			if (distance <= ball.Size.x / 2.0f) {
-				selectedBall = {&ball, ball.Color};
-				// set selected ball to white
-				ball.Color = glm::vec3(1);
+				selectedBall = &ball;
+				// make selected ball brighter
+				ball.Color += glm::vec3(0.1);
 				// only select one ball
 				break;
 			}
 		}
-		// reset selected ball to old colour
-	} else if (!MouseButtons[GLFW_MOUSE_BUTTON_LEFT] && selectedBall.first) {
-		selectedBall.first->Color = selectedBall.second;
-		selectedBall.first = nullptr;
 	}
 }
 
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
-	// if there is a selected ball, make it follow the mouse pointer
-	if (selectedBall.first) {
-		selectedBall.first->Center = selectedBall.first->Center + ChangeInMousePos;
+	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
+	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
+		(*selectedBall)->Center = (*selectedBall)->Center + ChangeInMousePos;
 	}
 
 	// move balls down

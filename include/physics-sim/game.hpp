@@ -8,6 +8,7 @@
 
 #include <GLFW/glfw3.h>
 #include <memory>
+#include <optional>
 #include <vector>
 
 class Game {
@@ -18,7 +19,7 @@ private:
 	std::vector<Ball> balls;
 	std::unique_ptr<PhysObject> container;
 	// the vector stores the colour of the ball (as when selected is it re-coloured white)
-	std::pair<Ball*, glm::vec3> selectedBall = std::pair(nullptr, glm::vec3(0));
+	std::optional<Ball*> selectedBall;
 
 	PhysObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 
