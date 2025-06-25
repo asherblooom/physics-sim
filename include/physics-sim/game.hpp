@@ -15,11 +15,13 @@ class Game {
 private:
 	// the max values in the coordinate system for x and y respectively
 	unsigned int width, height;
+	// this is a pointer so that we can choose when to destruct it (that is, before glfwTerminate is called)
 	SpriteRenderer* renderer;
 	std::vector<Ball> balls;
 	std::unique_ptr<PhysObject> container;
-	// the vector stores the colour of the ball (as when selected is it re-coloured white)
-	std::optional<Ball*> selectedBall;
+	// stores a pointer to the ball in the balls vector when said ball is hovered over
+	// set to nullptr if no ball is hovered over
+	Ball* selectedBall;
 
 	PhysObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 

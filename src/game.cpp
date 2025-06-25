@@ -41,10 +41,10 @@ void Game::ProcessInput(float dt) {
 	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
 	// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		auto selctedDistance = std::sqrt(std::pow(MousePos.x - (*selectedBall)->Center.x, 2) + std::pow(MousePos.y - (*selectedBall)->Center.y, 2));
-		if (selctedDistance > (*selectedBall)->Size.x / 2.0f) {
-			(*selectedBall)->Color -= glm::vec3(0.1);
-			selectedBall.reset();
+		auto selctedDistance = std::sqrt(std::pow(MousePos.x - selectedBall->Center.x, 2) + std::pow(MousePos.y - selectedBall->Center.y, 2));
+		if (selctedDistance > selectedBall->Size.x / 2.0f) {
+			selectedBall->Color -= glm::vec3(0.1);
+			selectedBall = nullptr;
 		}
 	}
 	if (!selectedBall) {
@@ -66,7 +66,7 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		(*selectedBall)->Center = (*selectedBall)->Center + ChangeInMousePos;
+		selectedBall->Center = selectedBall->Center + ChangeInMousePos;
 	}
 
 	// move balls down
