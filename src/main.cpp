@@ -1,16 +1,24 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <physics-sim/game.hpp>
 
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
+//used to calculate change in mouse position
+glm::vec2 oldMousePosWorld = {0, 0};  // world space position
+int xposOld, yposOld;				  // screen space position
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-const glm::vec2 getMousePos(GLFWwindow* window);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
+void updateMousePosition(GLFWwindow* window, double xpos, double ypos);
+
+// here width and height are the max values for the x and y coords respectively
 Game* physSim = new Game(SCR_WIDTH, SCR_HEIGHT);
 
 int main() {
@@ -40,15 +48,18 @@ int main() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// set initial viewport
-	framebuffer_size_callback(window, SCR_WIDTH, SCR_HEIGHT);
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	framebuffer_size_callback(window, width, height);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	physSim->Init();
 
-	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
+	float deltaTime, lastFrame;
+	double xpos, ypos;
 
 	// Event loop
 	while (!glfwWindowShouldClose(window)) {
@@ -61,11 +72,16 @@ int main() {
 
 		// manage user input
 		// -----------------
+		glfwGetCursorPos(window, &xpos, &ypos);
+		if (xpos - xposOld != 0 && ypos - yposOld != 0) {
+			updateMousePosition(window, xpos, ypos);
+		} else {
+			physSim->ChangeInMousePos = glm::vec2(0);
+		}
 		physSim->ProcessInput(deltaTime);
 
 		// update game state
 		// -----------------
-		physSim->MousePos = getMousePos(window);
 		physSim->Update(deltaTime);
 
 		// render
@@ -126,23 +142,34 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
-const glm::vec2 getMousePos(GLFWwindow* window) {
+void updateMousePosition(GLFWwindow* window, double xpos, double ypos) {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	auto [x, y, gameWidth, gameHeight] = calculateRenderBounds(width, height);
 
-	double cursorX, cursorY;
-	glfwGetCursorPos(window, &cursorX, &cursorY);
-
 	//transform coordinates from screen space into world space
 
 	//move top left to match beginning of render area
-	cursorX = cursorX - x;
-	cursorY = cursorY - y;
+	xpos = xpos - x;
+	ypos = ypos - y;
 
-	//we know world space has coordinates (0, 0) to (1920, 1080)
-	double xRatio = 1920.0 / gameWidth;
-	double yRatio = 1080.0 / gameHeight;
+	//we know world space has coordinates (0, 0) to (SCR_WIDTH, SCR_HEIGHT)
+	// as those constants are what we used to construct our Game object with
+	double xRatio = SCR_WIDTH / gameWidth;
+	double yRatio = SCR_HEIGHT / gameHeight;
+	glm::vec2 mousePos = {xpos * xRatio, ypos * yRatio};
 
-	return glm::vec2(cursorX * xRatio, cursorY * yRatio);
+	physSim->MousePos = mousePos;
+	physSim->ChangeInMousePos = mousePos - oldMousePosWorld;
+	oldMousePosWorld = mousePos;
+}
+
+// callback for processing mouse input
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	if (button >= 0 && button <= 2) {
+		if (action == GLFW_PRESS)
+			physSim->MouseButtons[button] = true;
+		else if (action == GLFW_RELEASE)
+			physSim->MouseButtons[button] = false;
+	}
 }

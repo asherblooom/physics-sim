@@ -13,16 +13,21 @@
 
 class Game {
 private:
+	// the max values in the coordinate system for x and y respectively
 	unsigned int width, height;
 	SpriteRenderer* renderer;
 	std::vector<Ball> balls;
 	std::unique_ptr<PhysObject> container;
+	// the vector stores the colour of the ball (as when selected is it re-coloured white)
+	std::pair<Ball*, glm::vec3> selectedBall = std::pair(nullptr, glm::vec3(0));
 
 	PhysObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 
 public:
 	bool Keys[1024];
+	bool MouseButtons[3];
 	glm::vec2 MousePos;
+	glm::vec2 ChangeInMousePos;
 	Game(unsigned int width, unsigned int height);
 	~Game() {
 		delete renderer;

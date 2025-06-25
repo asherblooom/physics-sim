@@ -1,19 +1,19 @@
-#include <iostream>
 #include <physics-sim/game.hpp>
 
+#include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <cstring>
-#include <physics-sim/ball.hpp>
+#include <iostream>
 
 Game::Game(unsigned int width, unsigned int height)
-	: width(width), height(height), Keys(), MousePos(glm::vec2(0)) {
+	: width(width), height(height) {
 }
 
 void Game::Init() {
 	// load shaders
 	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vs", "src/shaders/sprite.frag");
 	// configure shaders
-	glm::mat4 projection = glm::ortho(0.0f, (float)1920, (float)1080, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 	Shader& spriteShader = ResourceManager::GetShader("sprite");
 	spriteShader.Use();
 	spriteShader.SetInteger("image", 0);
@@ -31,24 +31,40 @@ void Game::Init() {
 
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
-		makeBall(glm::vec2(960, 100),
+		makeBall(glm::vec2(width / 2, height / 10),
 				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
 				 glm::vec2(0, 5));
 		// only want one ball per key press
 		Keys[GLFW_KEY_N] = false;
 	}
+	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
+	if (MouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !selectedBall.first) {
+		// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
+		for (int i = balls.size() - 1; i >= 0; i--) {
+			Ball& ball = balls[i];
+			auto distance = std::sqrt(std::pow(MousePos.x - ball.Center().x, 2) + std::pow(MousePos.y - ball.Center().y, 2));
+			if (distance <= ball.Size.x / 2.0f) {
+				selectedBall = {&ball, ball.Color};
+				// set selected ball to white
+				ball.Color = glm::vec3(1);
+				// only select one ball
+				break;
+			}
+		}
+		// reset selected ball to old colour
+	} else if (!MouseButtons[GLFW_MOUSE_BUTTON_LEFT] && selectedBall.first) {
+		selectedBall.first->Color = selectedBall.second;
+		selectedBall.first = nullptr;
+	}
 }
 
 //TODO: make movement fps independent!!!
 void Game::Update(float dt) {
-	std::cout << MousePos.x << " ";
-	for (auto& ball : balls) {
-		auto ballCenter = ball.Position() + (ball.Size / 2.0f);
-		auto distance = std::sqrt(std::pow(MousePos.x - ballCenter.x, 2) + std::pow(MousePos.y - ballCenter.y, 2));
-		if (distance <= ball.Size.x / 2.0f) {
-			ball.Color = glm::vec3(1);
-		}
+	// if there is a selected ball, make it follow the mouse pointer
+	if (selectedBall.first) {
+		selectedBall.first->SetCenter(selectedBall.first->Center() + ChangeInMousePos);
 	}
+
 	// move balls down
 	for (auto& ball : balls) {
 		// if ((object->Position + object->Velocity).y >= 1000.0f) continue;
