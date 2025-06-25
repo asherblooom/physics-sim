@@ -18,7 +18,7 @@ public:
 	void Draw(SpriteRenderer& renderer);
 	GameObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f));
 
-	const glm::vec2& Position() const { return position; }
+	virtual const glm::vec2& Position() { return position; }
 	virtual void SetPosition(glm::vec2 position) { this->position = position; };
 
 protected:

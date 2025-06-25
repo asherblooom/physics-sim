@@ -42,7 +42,7 @@ void Game::ProcessInput(float dt) {
 		// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
 		for (int i = balls.size() - 1; i >= 0; i--) {
 			Ball& ball = balls[i];
-			auto distance = std::sqrt(std::pow(MousePos.x - ball.Center().x, 2) + std::pow(MousePos.y - ball.Center().y, 2));
+			auto distance = std::sqrt(std::pow(MousePos.x - ball.Center.x, 2) + std::pow(MousePos.y - ball.Center.y, 2));
 			if (distance <= ball.Size.x / 2.0f) {
 				selectedBall = {&ball, ball.Color};
 				// set selected ball to white
@@ -62,7 +62,7 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	// if there is a selected ball, make it follow the mouse pointer
 	if (selectedBall.first) {
-		selectedBall.first->SetCenter(selectedBall.first->Center() + ChangeInMousePos);
+		selectedBall.first->Center = selectedBall.first->Center + ChangeInMousePos;
 	}
 
 	// move balls down

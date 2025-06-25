@@ -9,15 +9,15 @@ Ball::Ball(glm::vec2 center, float diameter, glm::vec3 color, glm::vec2 velocity
 				 ResourceManager::GetTexture("ball"),
 				 color,
 				 velocity},
-	  Radius{diameter / 2.0f},
-	  center{center} {}
+	  Center{center},
+	  Radius{diameter / 2.0f} {}
 
-// position is top left corner of box containing ball, for rendering purposes
-void Ball::SetCenter(glm::vec2 center) {
-	this->center = center;
-	position = center - Size / 2.0f;
-}
+// position is top left corner of box containing ball, used for rendering purposes
 void Ball::SetPosition(glm::vec2 position) {
 	this->position = position;
-	center = position + Size / 2.0f;
+	Center = position + Size / 2.0f;
+}
+const glm::vec2& Ball::Position() {
+	this->position = Center - Size / 2.0f;
+	return this->position;
 }
