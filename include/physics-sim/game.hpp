@@ -10,6 +10,15 @@
 #include <memory>
 #include <vector>
 
+// TODO: encapsulate this better - in seperate PhysicsEngine class?
+struct CollisionPoints {
+	glm::vec2 A;	   // Furthest point of A into B
+	glm::vec2 B;	   // Furthest point of B into A
+	glm::vec2 Normal;  // B – A normalized
+	float Depth;	   // Length of B – A
+	bool HasCollision;
+};
+
 class Game {
 private:
 	// the max values in the coordinate system for x and y respectively
@@ -23,6 +32,38 @@ private:
 	Ball* selectedBall;
 
 	PhysObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
+
+	// TODO: --------------- ahhhh why is this here :(
+	CollisionPoints TestSphereSphere(const PhysObject& a, const PhysObject& b);
+	CollisionPoints TestSpherePlane(const PhysObject& a, const PhysObject& b);
+
+	// FIXME: AHHHHHHHHH
+	// (from https://winter.dev/articles/physics-engine)
+	using FindContactFunc = CollisionPoints (*)(const PhysObject*, const PhysObject*);
+	CollisionPoints TestCollision(const PhysObject& a, const PhysObject& b) {
+		static const FindContactFunc tests[2][2] =
+			{
+				// Sphere             Plane
+				{TestSphereSphere, TestSpherePlane},  // Sphere
+				{nullptr, nullptr}					  // Plane
+			};
+		// If we are passed a Plane vs Sphere, swap the
+		// colliders so it's a Sphere vs Plane
+		bool swap = b->Type > a->Type;
+		if (swap) {
+			std::swap(a, b);
+		}
+		// now we can dispatch the correct function
+		CollisionPoints points = tests[a->Type][b->Type](a, b);
+
+		// if we swapped the order of the colliders, to keep the
+		// results consistent, we need to swap the points
+		if (swap) {
+			std::swap(points.A, points.B);
+			points.Normal = -points.Normal;
+		}
+		return points;
+	}
 
 public:
 	//Physics constants

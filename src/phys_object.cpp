@@ -5,6 +5,9 @@ PhysObject::PhysObject(glm::vec2 center, glm::vec2 size, float mass, Texture2D t
 
 void PhysObject::ResolveForces(float dt) {
 	velocity += (force / Mass) * dt;
+	// 30 is added because the world space is so big (1920 x 1080) that if we are moving 9.81 pixels per second that is absolutely nothing
+	// so we need to scale it up
+	// TODO: think of a better way to do this??
 	Center += (velocity * dt) * 30.0f;
 }
 

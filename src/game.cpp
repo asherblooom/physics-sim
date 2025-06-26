@@ -1,10 +1,10 @@
-#include <optional>
 #include <physics-sim/game.hpp>
 
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <physics-sim/plane.hpp>
 
 Game::Game(unsigned int width, unsigned int height)
 	: width(width), height(height) {
@@ -23,11 +23,9 @@ void Game::Init() {
 	renderer = new SpriteRenderer(spriteShader);
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
-	ResourceManager::LoadTexture("container", "textures/container.dds");
+	ResourceManager::LoadTexture("plane", "textures/plane.dds");
 
-	glm::vec2 containerPos = glm::vec2(width / 2, height / 2);
-	glm::vec2 containerSize = glm::vec2(width, height);
-	container = std::make_unique<PhysObject>(containerPos, containerSize, 0, ResourceManager::GetTexture("container"));
+	container = std::make_unique<Plane>(glm::vec2(width / 2, height - 20), glm::vec2(0, 1), width);
 }
 
 void Game::ProcessInput(float dt) {
