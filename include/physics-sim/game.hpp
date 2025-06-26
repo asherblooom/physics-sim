@@ -26,7 +26,7 @@ private:
 
 public:
 	//Physics constants
-	static constexpr glm::vec2 gravity = {0, 9.81};
+	static constexpr glm::vec2 gravity = {0, -9.81};
 
 	bool Keys[1024];
 	bool MouseButtons[3];

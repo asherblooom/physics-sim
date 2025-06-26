@@ -39,9 +39,9 @@ void Game::ProcessInput(float dt) {
 		Keys[GLFW_KEY_N] = false;
 	}
 	if (Keys[GLFW_KEY_M]) {
-		makeBall(glm::vec2(width / 2, height / 10),
+		makeBall(glm::vec2(width - 100, height - 100),
 				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
-				 glm::vec2(0, -50));
+				 glm::vec2(-15, 15));
 		// only want one ball per key press
 		Keys[GLFW_KEY_M] = false;
 	}
@@ -80,7 +80,7 @@ void Game::Update(float dt) {
 	// move balls down
 	for (auto& ball : balls) {
 		if (&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) continue;
-		ball.AddForce(gravity / ball.MassInv);
+		ball.AddForce(gravity * ball.Mass);
 		ball.ResolveForces(dt);
 		ball.ClearForces();
 	}

@@ -58,7 +58,7 @@ int main() {
 
 	physSim->Init();
 
-	float deltaTime, lastFrame;
+	float deltaTime, lastFrame = 0.0f;
 	double xpos, ypos;
 
 	// Event loop
