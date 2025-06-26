@@ -1,6 +1,7 @@
 # physics-sim
 ## TODO:
-- [ ] encapsulate physics stuff in PhysicsEngine class!
+- [ ] fix all in-code todos
+- [ ] encapsulate physics stuff in PhysicsEngine class
 - [ ] look into "Destructor called on non-final "Ball" that has virtual functions but non-virtual destructor" warning
 ###
 - [ ] change force/velocity when ball dragged
