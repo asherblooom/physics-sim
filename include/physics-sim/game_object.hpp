@@ -11,18 +11,18 @@
 // minimal of state as described within GameObject.
 class GameObject {
 public:
-	glm::vec3 Color;
-	const glm::vec2 Size;
-	const Texture2D Texture;
+	glm::vec3 RenderColor;
+	const glm::vec2 RenderSize;
+	const Texture2D RenderTexture;
 
 	void Draw(SpriteRenderer& renderer);
 	GameObject(glm::vec2 pos, glm::vec2 size, Texture2D texture, glm::vec3 color = glm::vec3(1.0f));
 
-	virtual const glm::vec2& Position() { return position; }
-	virtual void SetPosition(glm::vec2 position) { this->position = position; };
+	virtual const glm::vec2& RenderPosition() { return renderPosition; }
+	virtual void SetRenderPosition(glm::vec2 position) { this->renderPosition = position; };
 
 protected:
-	glm::vec2 position;
+	glm::vec2 renderPosition;
 	float rotation;
 };
 

@@ -25,25 +25,32 @@ void Game::Init() {
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 	ResourceManager::LoadTexture("container", "textures/container.dds");
 
-	glm::vec2 containerPos = glm::vec2(0, 0);
+	glm::vec2 containerPos = glm::vec2(width / 2, height / 2);
 	glm::vec2 containerSize = glm::vec2(width, height);
-	container = std::make_unique<PhysObject>(containerPos, containerSize, ResourceManager::GetTexture("container"));
+	container = std::make_unique<PhysObject>(containerPos, containerSize, 0, ResourceManager::GetTexture("container"));
 }
 
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
 		makeBall(glm::vec2(width / 2, height / 10),
 				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
-				 glm::vec2(0, 5));
+				 glm::vec2(0, 0));
 		// only want one ball per key press
 		Keys[GLFW_KEY_N] = false;
+	}
+	if (Keys[GLFW_KEY_M]) {
+		makeBall(glm::vec2(width / 2, height / 10),
+				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
+				 glm::vec2(0, -50));
+		// only want one ball per key press
+		Keys[GLFW_KEY_M] = false;
 	}
 	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
 	// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		auto selctedDistance = std::sqrt(std::pow(MousePos.x - selectedBall->Center.x, 2) + std::pow(MousePos.y - selectedBall->Center.y, 2));
-		if (selctedDistance > selectedBall->Size.x / 2.0f) {
-			selectedBall->Color -= glm::vec3(0.1);
+		if (selctedDistance > selectedBall->RenderSize.x / 2.0f) {
+			selectedBall->RenderColor -= glm::vec3(0.1);
 			selectedBall = nullptr;
 		}
 	}
@@ -51,10 +58,10 @@ void Game::ProcessInput(float dt) {
 		for (int i = balls.size() - 1; i >= 0; i--) {
 			Ball& ball = balls[i];
 			auto distance = std::sqrt(std::pow(MousePos.x - ball.Center.x, 2) + std::pow(MousePos.y - ball.Center.y, 2));
-			if (distance <= ball.Size.x / 2.0f) {
+			if (distance <= ball.RenderSize.x / 2.0f) {
 				selectedBall = &ball;
 				// make selected ball brighter
-				ball.Color += glm::vec3(0.1);
+				ball.RenderColor += glm::vec3(0.1);
 				// only select one ball
 				break;
 			}
@@ -67,12 +74,15 @@ void Game::Update(float dt) {
 	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		selectedBall->Center = selectedBall->Center + ChangeInMousePos;
+		selectedBall->ClearVelocity();
 	}
 
 	// move balls down
 	for (auto& ball : balls) {
-		// if ((object->Position + object->Velocity).y >= 1000.0f) continue;
-		// object->Position += object->Velocity;
+		if (&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) continue;
+		ball.AddForce(gravity / ball.MassInv);
+		ball.ResolveForces(dt);
+		ball.ClearForces();
 	}
 }
 
@@ -85,7 +95,7 @@ void Game::Render() {
 }
 
 PhysObject& Game::makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
-	auto ball = Ball(pos, 1.0f, color, velocity);
+	auto ball = Ball(pos, 1.0f, 1.0f, color, velocity);
 	balls.push_back(std::move(ball));
 	return balls.back();
 }

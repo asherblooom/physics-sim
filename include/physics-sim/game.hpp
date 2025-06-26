@@ -8,7 +8,6 @@
 
 #include <GLFW/glfw3.h>
 #include <memory>
-#include <optional>
 #include <vector>
 
 class Game {
@@ -26,6 +25,9 @@ private:
 	PhysObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 
 public:
+	//Physics constants
+	static constexpr glm::vec2 gravity = {0, 9.81};
+
 	bool Keys[1024];
 	bool MouseButtons[3];
 	glm::vec2 MousePos;
