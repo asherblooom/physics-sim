@@ -6,9 +6,12 @@
 #include <physics-sim/game_object.hpp>
 #include <physics-sim/texture.hpp>
 
-// an object that can be manipulated by the physics engine
+class Ball;
+class Plane;
+
+// a general object that can be manipulated by the physics engine
 class PhysObject : public GameObject {
-public:
+   public:
 	glm::vec2 Center;
 	const float Mass;
 
@@ -22,8 +25,13 @@ public:
 	}
 	// will update center based on forces added
 	void ResolveForces(float dt);
-	void ClearForces() { force = glm::vec3(0); }
 
+	// collision functions using visitor pattern/double dispatch
+	virtual void AcceptForCollision(PhysObject& obj) = 0;
+	virtual void CollideWithBall(Ball& b) = 0;
+	virtual void CollideWithPlane(Plane& p) = 0;
+
+	void ClearForces() { force = glm::vec3(0); }
 	void ClearVelocity() { velocity = glm::vec3(0); }
 
 	// need to calculate position from center when getting and vice versa when setting
@@ -31,8 +39,36 @@ public:
 	void SetRenderPosition(glm::vec2 position) override;
 	const glm::vec2& RenderPosition() override;
 
-protected:
+   protected:
 	glm::vec2 velocity, force;
+};
+
+// a ball object
+class Ball : public PhysObject {
+   public:
+	const float Radius;
+	Ball(glm::vec2 center, float diameter = 1.0f, float mass = 1.0f, glm::vec3 color = glm::vec3(1.0f), glm::vec2 velocity = glm::vec2(0.0f));
+
+	void AcceptForCollision(PhysObject& obj) {
+		obj.CollideWithBall(*this);
+	}
+	void CollideWithBall(Ball& b);
+	void CollideWithPlane(Plane& p);
+};
+
+// a plane object
+class Plane : public PhysObject {
+   public:
+	const glm::vec2 Normal;
+	float Distance = 0;	 //??
+	float Length;
+	Plane(glm::vec2 center, glm::vec2 normal, float length, glm::vec3 color = glm::vec3(1.0f));
+
+	void AcceptForCollision(PhysObject& obj) {
+		obj.CollideWithPlane(*this);
+	}
+	void CollideWithBall(Ball& b);
+	void CollideWithPlane(Plane& p);
 };
 
 #endif

@@ -1,7 +1,5 @@
-#include <physics-sim/ball.hpp>
+#include <physics-sim/phys_object.hpp>
 #include <physics-sim/resource_manager.hpp>
-
-#include <cmath>
 
 Ball::Ball(glm::vec2 center, float diameter, float mass, glm::vec3 color, glm::vec2 velocity)
 	: PhysObject{center,
