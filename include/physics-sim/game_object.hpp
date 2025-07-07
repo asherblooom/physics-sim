@@ -10,7 +10,7 @@
 // game object entity. Each object in the game likely needs the
 // minimal of state as described within GameObject.
 class GameObject {
-public:
+   public:
 	glm::vec3 RenderColor;
 	const glm::vec2 RenderSize;
 	const Texture2D RenderTexture;
@@ -21,7 +21,7 @@ public:
 	virtual const glm::vec2& RenderPosition() { return renderPosition; }
 	virtual void SetRenderPosition(glm::vec2 position) { this->renderPosition = position; };
 
-protected:
+   protected:
 	glm::vec2 renderPosition;
 	float rotation;
 };

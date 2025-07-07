@@ -10,3 +10,11 @@ Plane::Plane(glm::vec2 center, glm::vec2 normal, float length, glm::vec3 color)
 				 glm::vec2(0)},
 	  Normal{normal},
 	  Length{length} {}
+
+CollisionPoints Plane::CollideWithBall(Ball &b) {
+	return {glm::vec2(0), glm::vec2(0), glm::vec2(0), 0, false};
+}
+
+CollisionPoints Plane::CollideWithPlane(Plane &p) {
+	return {glm::vec2(0), glm::vec2(0), glm::vec2(0), 0, false};
+}

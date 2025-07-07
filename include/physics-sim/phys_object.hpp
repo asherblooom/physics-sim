@@ -6,8 +6,23 @@
 #include <physics-sim/game_object.hpp>
 #include <physics-sim/texture.hpp>
 
+class PhysObject;
 class Ball;
 class Plane;
+
+// TODO: encapsulate this better - in seperate PhysicsEngine class?
+struct CollisionPoints {
+	glm::vec2 A;	   // Furthest point of A into B
+	glm::vec2 B;	   // Furthest point of B into A
+	glm::vec2 Normal;  // B – A normalized
+	float Depth;	   // Length of B – A
+	bool HasCollision;
+};
+struct CollisionInfo {
+	PhysObject* A;
+	PhysObject* B;
+	CollisionPoints points;
+};
 
 // a general object that can be manipulated by the physics engine
 class PhysObject : public GameObject {
@@ -25,14 +40,13 @@ class PhysObject : public GameObject {
 	}
 	// will update center based on forces added
 	void ResolveForces(float dt);
-
-	// collision functions using visitor pattern/double dispatch
-	virtual void AcceptForCollision(PhysObject& obj) = 0;
-	virtual void CollideWithBall(Ball& b) = 0;
-	virtual void CollideWithPlane(Plane& p) = 0;
-
 	void ClearForces() { force = glm::vec3(0); }
 	void ClearVelocity() { velocity = glm::vec3(0); }
+
+	// collision functions using visitor pattern/double dispatch
+	virtual CollisionPoints DetectCollision(PhysObject& obj) = 0;
+	virtual CollisionPoints CollideWithBall(Ball& b) = 0;
+	virtual CollisionPoints CollideWithPlane(Plane& p) = 0;
 
 	// need to calculate position from center when getting and vice versa when setting
 	// done this way as position (used for rendering) will most likely be queried far less than center (used for physics)
@@ -49,11 +63,11 @@ class Ball : public PhysObject {
 	const float Radius;
 	Ball(glm::vec2 center, float diameter = 1.0f, float mass = 1.0f, glm::vec3 color = glm::vec3(1.0f), glm::vec2 velocity = glm::vec2(0.0f));
 
-	void AcceptForCollision(PhysObject& obj) {
-		obj.CollideWithBall(*this);
+	CollisionPoints DetectCollision(PhysObject& obj) override {
+		return obj.CollideWithBall(*this);
 	}
-	void CollideWithBall(Ball& b);
-	void CollideWithPlane(Plane& p);
+	CollisionPoints CollideWithBall(Ball& b) override;
+	CollisionPoints CollideWithPlane(Plane& p) override;
 };
 
 // a plane object
@@ -64,11 +78,11 @@ class Plane : public PhysObject {
 	float Length;
 	Plane(glm::vec2 center, glm::vec2 normal, float length, glm::vec3 color = glm::vec3(1.0f));
 
-	void AcceptForCollision(PhysObject& obj) {
-		obj.CollideWithPlane(*this);
+	CollisionPoints DetectCollision(PhysObject& obj) override {
+		return obj.CollideWithPlane(*this);
 	}
-	void CollideWithBall(Ball& b);
-	void CollideWithPlane(Plane& p);
+	CollisionPoints CollideWithBall(Ball& b) override;
+	CollisionPoints CollideWithPlane(Plane& p) override;
 };
 
 #endif
