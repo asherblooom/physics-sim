@@ -134,7 +134,6 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 	auto ballTex = ResourceManager::GetTexture("circle");
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
-	auto ball = GameObject(pos, glm::vec2(diameter), *renderer, ballTex, 1.0f, velocity, color);
-	balls.push_back(std::move(ball));
+	balls.emplace_back(pos, glm::vec2(diameter), *renderer, ballTex, 1.0f, velocity, color);
 	return balls.back();
 }

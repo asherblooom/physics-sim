@@ -24,6 +24,7 @@ public:
 	RenderObject Render;
 	PhysObject Physics;
 	// TODO: initialise bounding volume
+	// FIXME: AHHHHHHHHHHHHH
 	std::unique_ptr<CollisionVolume> BoundingVolume;
 };
 
