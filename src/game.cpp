@@ -3,6 +3,9 @@
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
+#include "game_object.hpp"
+#include "resource_manager.hpp"
 
 Game::Game(unsigned int width, unsigned int height)
 	: width(width), height(height) {
@@ -23,7 +26,10 @@ void Game::Init() {
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 	ResourceManager::LoadTexture("plane", "textures/plane.dds");
 
-	container = new Plane(glm::vec2(width / 2, height - 20), glm::vec2(0, 1), width);
+	//TODO: initialise bounding boxes???
+	//TODO: add another constructor for static objects
+	auto planeTex = ResourceManager::GetTexture("plane");
+	container = new GameObject(glm::vec2(0, height - 40), glm::vec2(width), *renderer, planeTex);
 }
 
 void Game::ProcessInput(float dt) {
@@ -41,23 +47,22 @@ void Game::ProcessInput(float dt) {
 		// only want one ball per key press
 		Keys[GLFW_KEY_M] = false;
 	}
-	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
-	// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
+	// if there is a selected ball and the mouse button is no longer held, deselect it
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		auto selctedDistance = std::sqrt(std::pow(MousePos.x - selectedBall->Center.x, 2) + std::pow(MousePos.y - selectedBall->Center.y, 2));
-		if (selctedDistance > selectedBall->Radius) {
-			selectedBall->RenderColor -= glm::vec3(0.1);
+		if (!selectedBall->BoundingVolume->DetectMouseOver(MousePos)) {
+			selectedBall->Render.Color -= glm::vec3(0.1);
 			selectedBall = nullptr;
 		}
 	}
-	if (!selectedBall) {
+	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
+	// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
+	if (!selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		for (int i = balls.size() - 1; i >= 0; i--) {
-			Ball& ball = balls[i];
-			auto distance = std::sqrt(std::pow(MousePos.x - ball.Center.x, 2) + std::pow(MousePos.y - ball.Center.y, 2));
-			if (distance <= ball.Radius) {
+			auto& ball = balls[i];
+			if (ball.BoundingVolume->DetectMouseOver(MousePos)) {
 				selectedBall = &ball;
 				// make selected ball brighter
-				ball.RenderColor += glm::vec3(0.1);
+				ball.Render.Color += glm::vec3(0.1);
 				// only select one ball
 				break;
 			}
@@ -69,18 +74,19 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		selectedBall->Center = selectedBall->Center + ChangeInMousePos;
-		selectedBall->ClearVelocity();
+		selectedBall->transform.Position += ChangeInMousePos;
+		// make sure gravity and any other forces don't affect its position
+		selectedBall->Physics.ClearVelocity();
 	}
 
 	std::vector<CollisionInfo> collisions;
 	if (balls.size() > 0) {
 		// move balls[0]
-		Ball& ball = balls[0];
+		auto& ball = balls[0];
 		if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-			// ball.AddForce(gravity * ball.Mass);
-			ball.ResolveForces(dt);
-			ball.ClearForces();
+			// ball.Physics.AddForce(gravity * ball.Mass);
+			ball.Physics.ResolveForces(dt);
+			ball.Physics.ClearForces();
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
@@ -88,28 +94,28 @@ void Game::Update(float dt) {
 				// move every ball from balls[1] to balls[size]
 				// only moved if i == 0 as we only want to move balls once (on first iteration)
 				if (i == 0) {
-					Ball& ball = balls[j];
+					auto& ball = balls[j];
 					if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-						// ball.AddForce(gravity * ball.Mass);
-						ball.ResolveForces(dt);
-						ball.ClearForces();
+						// ball.Physics.AddForce(gravity * ball.Mass);
+						ball.Physics.ResolveForces(dt);
+						ball.Physics.ClearForces();
 					}
 				}
 				// check collisions
-				CollisionPoints points = balls[i].DetectCollision(balls[j]);
+				CollisionPoints points = balls[i].BoundingVolume->DetectCollision(*balls[j].BoundingVolume);
 				if (points.HasCollision) {
 					collisions.emplace_back(&balls[i], &balls[j], points);
 				}
 			}
 			// collide with container
-			CollisionPoints points = balls[i].DetectCollision(*container);
+			CollisionPoints points = balls[i].BoundingVolume->DetectCollision(*container->BoundingVolume);
 			if (points.HasCollision) {
 				collisions.emplace_back(&balls[i], container, points);
 			}
 			// TODO: extend bounding tubes here
 			for (auto collision : collisions) {
-				collision.A->RenderColor = glm::vec3(0);
-				collision.B->RenderColor = glm::vec3(0);
+				collision.A->Render.Color = glm::vec3(0);
+				collision.B->Render.Color = glm::vec3(0);
 			}
 		}
 
@@ -119,13 +125,16 @@ void Game::Update(float dt) {
 
 void Game::Render() {
 	for (auto& ball : balls) {
-		ball.Draw(*renderer);
+		ball.Render.Draw();
 	}
-	container->Draw(*renderer);
+	container->Render.Draw();
 }
 
-PhysObject& Game::makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity) {
-	auto ball = Ball(pos, 50.0f, 1.0f, color, velocity);
+GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
+	auto ballTex = ResourceManager::GetTexture("circle");
+	float diameter = 50.0f;
+	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
+	auto ball = GameObject(pos, glm::vec2(diameter), *renderer, ballTex, 1.0f, velocity, color);
 	balls.push_back(std::move(ball));
 	return balls.back();
 }
