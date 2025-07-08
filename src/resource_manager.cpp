@@ -1,6 +1,7 @@
-#include <physics-sim/resource_manager.hpp>
+#include "resource_manager.hpp"
 
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>

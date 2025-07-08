@@ -1,5 +1,5 @@
-#include <physics-sim/phys_object.hpp>
-#include <physics-sim/resource_manager.hpp>
+#include "../resource_manager.hpp"
+#include "phys_object.hpp"
 
 Plane::Plane(glm::vec2 center, glm::vec2 normal, float length, glm::vec3 color)
 	: PhysObject{center,

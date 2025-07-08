@@ -7,8 +7,8 @@
 
 #include <glad/glad.h>
 
-#include <physics-sim/shader.hpp>
-#include <physics-sim/texture.hpp>
+#include "render/shader.hpp"
+#include "render/texture.hpp"
 
 // A static singleton ResourceManager class that hosts several functions to load Textures and Shaders.
 // Each loaded texture and/or shader is also stored for future reference by string handles.

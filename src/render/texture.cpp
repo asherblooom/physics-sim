@@ -1,4 +1,4 @@
-#include <physics-sim/texture.hpp>
+#include "texture.hpp"
 
 Texture2D::Texture2D() {
 	glGenTextures(1, &ID_);

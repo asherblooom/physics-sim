@@ -1,4 +1,4 @@
-#include <physics-sim/sprite_renderer.hpp>
+#include "sprite_renderer.hpp"
 
 SpriteRenderer::SpriteRenderer(Shader &shader) : shader{shader} {
 	initRenderData();

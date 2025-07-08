@@ -1,5 +1,5 @@
+#include "shader.hpp"
 #include <iostream>
-#include <physics-sim/shader.hpp>
 
 void Shader::Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource) {
 	GLuint vertex_shader, fragment_shader, geometry_shader;

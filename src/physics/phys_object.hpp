@@ -3,8 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include <physics-sim/game_object.hpp>
-#include <physics-sim/texture.hpp>
+#include "../render/game_object.hpp"
 
 class PhysObject;
 class Ball;

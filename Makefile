@@ -1,12 +1,12 @@
 TARGET_EXEC := phys-sim
 CXX:=g++
-INC_DIR:=include/
-CXXFLAGS:=-I$(INC_DIR) -Wall -Wextra -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -std=c++20
+LIB_DIR:=lib
+CXXFLAGS:=-I$(LIB_DIR) -Wall -Wextra -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -std=c++20
 OBJ_DIR:=./obj
 SRC_DIR:=./src
 
 GLAD_OBJ := $(OBJ_DIR)/glad.o
-GLAD_SRC := $(SRC_DIR)/glad.c
+GLAD_SRC := $(LIB_DIR)/glad/glad.c
 
 # Find all the C++ files we want to compile
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
@@ -23,6 +23,11 @@ main: obj $(TARGET_EXEC)
 $(TARGET_EXEC): $(OBJS) $(GLAD_OBJ)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
+# find sources not in base directory
+$(OBJ_DIR)/%.o: $(SRC_DIR)/*/%.cpp
+	$(CXX) -o $@ $< $(CXXFLAGS) -c
+
+# find sources in base directory
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
 
@@ -31,7 +36,7 @@ obj:
 
 # compiles the glad library
 $(GLAD_OBJ): $(GLAD_SRC) 
-	$(CXX) -I$(INC_DIR) $< -o $@ -c
+	$(CXX) -I$(LIB_DIR) $< -o $@ -c
 
 
 .PHONY: clean

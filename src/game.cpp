@@ -1,4 +1,4 @@
-#include <physics-sim/game.hpp>
+#include "game.hpp"
 
 #include <GLFW/glfw3.h>
 #include <cstdlib>

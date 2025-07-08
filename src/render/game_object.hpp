@@ -3,8 +3,8 @@
 
 #include <glm/glm.hpp>
 
-#include <physics-sim/sprite_renderer.hpp>
-#include <physics-sim/texture.hpp>
+#include "sprite_renderer.hpp"
+#include "texture.hpp"
 
 // Container object for holding all state relevant for a single
 // game object entity. Each object in the game likely needs the
