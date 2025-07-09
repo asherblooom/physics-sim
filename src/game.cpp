@@ -29,8 +29,7 @@ void Game::Init() {
 	//TODO: initialise bounding boxes???
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
-	//FIXME: make sure this is ok?
-	container = new GameObject(glm::vec2(0, height / 2), glm::vec2(width, height), AABB, *renderer, planeTex);
+	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, *renderer, planeTex);
 }
 
 void Game::ProcessInput(float dt) {
@@ -50,7 +49,7 @@ void Game::ProcessInput(float dt) {
 	}
 	// if there is a selected ball and the mouse button is no longer held, deselect it
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		if (!selectedBall->BoundingVolume->DetectMouseOver(MousePos)) {
+		if (!(selectedBall->BoundingVolume->DetectMouseOver(MousePos))) {
 			selectedBall->Render.Color -= glm::vec3(0.1);
 			selectedBall = nullptr;
 		}
@@ -91,21 +90,23 @@ void Game::Update(float dt) {
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
-			for (int j = i + 1; j < (int)balls.size(); j++) {
-				// move every ball from balls[1] to balls[size]
-				// only moved if i == 0 as we only want to move balls once (on first iteration)
-				if (i == 0) {
-					auto& ball = balls[j];
-					if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-						// ball.Physics.AddForce(gravity * ball.Mass);
-						ball.Physics.ResolveForces(dt);
-						ball.Physics.ClearForces();
+			if (balls.size() > 1) {
+				for (int j = i + 1; j < (int)balls.size(); j++) {
+					// move every ball from balls[1] to balls[size]
+					// only moved if i == 0 as we only want to move balls once (on first iteration)
+					if (i == 0) {
+						auto& ball = balls[j];
+						if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+							// ball.Physics.AddForce(gravity * ball.Mass);
+							ball.Physics.ResolveForces(dt);
+							ball.Physics.ClearForces();
+						}
 					}
-				}
-				// check collisions
-				CollisionPoints points = balls[i].BoundingVolume->DetectCollision(*balls[j].BoundingVolume);
-				if (points.HasCollision) {
-					collisions.emplace_back(&balls[i], &balls[j], points);
+					// check collisions
+					CollisionPoints points = balls[i].BoundingVolume->DetectCollision(*balls[j].BoundingVolume);
+					if (points.HasCollision) {
+						collisions.emplace_back(&balls[i], &balls[j], points);
+					}
 				}
 			}
 			// collide with container
@@ -135,6 +136,8 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 	auto ballTex = ResourceManager::GetTexture("ball");
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
-	balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, *renderer, ballTex, 1.0f, velocity, color);
+	auto ball = GameObject(pos, glm::vec2(diameter), CIRCLE, *renderer, ballTex, 1.0f, velocity, color);
+	balls.push_back(std::move(ball));
+	// balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, *renderer, ballTex, 1.0f, velocity, color);
 	return balls.back();
 }

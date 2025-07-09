@@ -27,6 +27,8 @@ public:
 
 	virtual bool DetectMouseOver(glm::vec2 mousePos) = 0;
 
+	virtual ~CollisionVolume() {}
+
 protected:
 	Transform* transform;
 	CollisionVolume(VolumeType type, Transform& parentTransform);
@@ -45,6 +47,8 @@ public:
 
 	bool DetectMouseOver(glm::vec2 mousePos) override;
 
+	~CircleVolume() {}
+
 private:
 	float getRadius();
 	glm::vec2 getCenter() override;
@@ -61,6 +65,8 @@ public:
 	CollisionPoints DetectAABBCollision(AABBVolume& c) override;
 
 	bool DetectMouseOver(glm::vec2 mousePos) override;
+
+	~AABBVolume() {}
 
 private:
 	glm::vec2 getCenter() override;

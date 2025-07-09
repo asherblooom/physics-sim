@@ -9,4 +9,10 @@ void PhysObject::ResolveForces(float dt) {
 	// so we need to scale it up
 	// TODO: think of a better way to do this??
 	transform->Position += (velocity * dt) * 30.0f;
+	if (transform->Position.x >= FLT_MAX) {
+		transform->Position.x = FLT_MAX;
+	}
+	if (transform->Position.y >= FLT_MAX) {
+		transform->Position.y = FLT_MAX;
+	}
 }
