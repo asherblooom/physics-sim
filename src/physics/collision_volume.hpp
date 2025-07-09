@@ -5,51 +5,65 @@
 #include "../transform.hpp"
 
 class CircleVolume;
-class PlaneVolume;
+class AABBVolume;
 
 enum VolumeType {
-	SPHERE,
-	PLANE
+	CIRCLE,
+	AABB
 };
 
 class CollisionVolume {
 public:
 	VolumeType Type;
+	// options for editing the volume independently of the (rendered) sprite
+	glm::vec2 PositionOffset;
+	float RotationOffset;
+	glm::vec2 SizeMultiplier;
 
 	// collision functions using visitor pattern/double dispatch
 	virtual CollisionPoints DetectCollision(CollisionVolume& c) = 0;
 	virtual CollisionPoints DetectCircleCollision(CircleVolume& c) = 0;
-	virtual CollisionPoints DetectPlaneCollision(PlaneVolume& c) = 0;
+	virtual CollisionPoints DetectAABBCollision(AABBVolume& c) = 0;
 
 	virtual bool DetectMouseOver(glm::vec2 mousePos) = 0;
+
+protected:
+	Transform* transform;
+	CollisionVolume(VolumeType type, Transform& parentTransform);
+	virtual glm::vec2 getCenter() = 0;
 };
 
-class CircleVolume : CollisionVolume {
+class CircleVolume : public CollisionVolume {
 public:
-	glm::vec2 Center;
-	float Radius;
+	CircleVolume(Transform& parentTransform);
 
 	CollisionPoints DetectCollision(CollisionVolume& c) override {
 		return c.DetectCircleCollision(*this);
 	}
 	CollisionPoints DetectCircleCollision(CircleVolume& c) override;
-	CollisionPoints DetectPlaneCollision(PlaneVolume& c) override;
+	CollisionPoints DetectAABBCollision(AABBVolume& c) override;
 
 	bool DetectMouseOver(glm::vec2 mousePos) override;
+
+private:
+	float getRadius();
+	glm::vec2 getCenter() override;
 };
 
-class PlaneVolume : CollisionVolume {
+class AABBVolume : public CollisionVolume {
 public:
-	glm::vec2 Normal;
-	float Distance;
+	AABBVolume(Transform& parentTransform);
 
 	CollisionPoints DetectCollision(CollisionVolume& c) override {
-		return c.DetectPlaneCollision(*this);
+		return c.DetectAABBCollision(*this);
 	}
 	CollisionPoints DetectCircleCollision(CircleVolume& c) override;
-	CollisionPoints DetectPlaneCollision(PlaneVolume& c) override;
+	CollisionPoints DetectAABBCollision(AABBVolume& c) override;
 
 	bool DetectMouseOver(glm::vec2 mousePos) override;
+
+private:
+	glm::vec2 getCenter() override;
 };
 
 #endif

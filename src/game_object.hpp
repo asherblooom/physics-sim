@@ -14,6 +14,7 @@ class GameObject {
 public:
 	GameObject(glm::vec2 position,
 			   glm::vec2 size,
+			   VolumeType volume,
 			   SpriteRenderer& renderer,
 			   Texture2D texture,
 			   float mass = 1.0f,
@@ -24,7 +25,6 @@ public:
 	RenderObject Render;
 	PhysObject Physics;
 	// TODO: initialise bounding volume
-	// FIXME: AHHHHHHHHHHHHH
 	std::unique_ptr<CollisionVolume> BoundingVolume;
 };
 

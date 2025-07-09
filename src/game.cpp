@@ -29,7 +29,8 @@ void Game::Init() {
 	//TODO: initialise bounding boxes???
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
-	container = new GameObject(glm::vec2(0, height - 40), glm::vec2(width), *renderer, planeTex);
+	//FIXME: make sure this is ok?
+	container = new GameObject(glm::vec2(0, height / 2), glm::vec2(width, height), AABB, *renderer, planeTex);
 }
 
 void Game::ProcessInput(float dt) {
@@ -54,9 +55,9 @@ void Game::ProcessInput(float dt) {
 			selectedBall = nullptr;
 		}
 	}
-	// if no ball currently selected and left mouse button down, select a ball which is over the mouse pointer
+	// if no ball currently selected, select a ball which is over the mouse pointer
 	// loop through balls in reverse order, so as to pick the one on top (drawn last) if any overlap
-	if (!selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
+	if (!selectedBall) {
 		for (int i = balls.size() - 1; i >= 0; i--) {
 			auto& ball = balls[i];
 			if (ball.BoundingVolume->DetectMouseOver(MousePos)) {
@@ -131,9 +132,9 @@ void Game::Render() {
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
-	auto ballTex = ResourceManager::GetTexture("circle");
+	auto ballTex = ResourceManager::GetTexture("ball");
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
-	balls.emplace_back(pos, glm::vec2(diameter), *renderer, ballTex, 1.0f, velocity, color);
+	balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, *renderer, ballTex, 1.0f, velocity, color);
 	return balls.back();
 }
