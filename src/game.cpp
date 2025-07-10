@@ -49,7 +49,7 @@ void Game::ProcessInput(float dt) {
 	// if there is a selected ball and the mouse button is no longer held, deselect it
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		if (!(selectedBall->BoundingVolume->DetectMouseOver(MousePos))) {
-			selectedBall->Render.Color -= glm::vec3(0.1);
+			selectedBall->Render->Color -= glm::vec3(0.1);
 			selectedBall = nullptr;
 		}
 	}
@@ -61,7 +61,7 @@ void Game::ProcessInput(float dt) {
 			if (ball.BoundingVolume->DetectMouseOver(MousePos)) {
 				selectedBall = &ball;
 				// make selected ball brighter
-				ball.Render.Color += glm::vec3(0.1);
+				ball.Render->Color += glm::vec3(0.1);
 				// only select one ball
 				break;
 			}
@@ -75,16 +75,16 @@ void Game::Update(float dt) {
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		selectedBall->transform->Position += ChangeInMousePos;
 		// make sure gravity and any other forces don't affect its position
-		selectedBall->Physics.ClearVelocity();
+		selectedBall->Physics->ClearVelocity();
 	}
 
 	std::vector<CollisionInfo> collisions;
 	if (balls.size() > 0) {
 		// move balls[0]
 		if (!(&balls[0] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-			balls[0].Physics.AddForce(gravity * balls[0].Physics.Mass);
-			balls[0].Physics.ResolveForces(dt);
-			balls[0].Physics.ClearForces();
+			balls[0].Physics->AddForce(gravity * balls[0].Physics->Mass);
+			balls[0].Physics->ResolveForces(dt);
+			balls[0].Physics->ClearForces();
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
@@ -94,9 +94,9 @@ void Game::Update(float dt) {
 					// only moved if i == 0 as we only want to move balls once (on first iteration)
 					if (i == 0) {
 						if (!(&balls[j] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-							balls[j].Physics.AddForce(gravity * balls[j].Physics.Mass);
-							balls[j].Physics.ResolveForces(dt);
-							balls[j].Physics.ClearForces();
+							balls[j].Physics->AddForce(gravity * balls[j].Physics->Mass);
+							balls[j].Physics->ResolveForces(dt);
+							balls[j].Physics->ClearForces();
 						}
 					}
 					// check collisions
@@ -113,8 +113,8 @@ void Game::Update(float dt) {
 			}
 			// TODO: extend bounding tubes here
 			for (CollisionInfo collision : collisions) {
-				collision.A->Render.Color = glm::vec3(0);
-				collision.B->Render.Color = glm::vec3(0);
+				collision.A->Render->Color = glm::vec3(0);
+				collision.B->Render->Color = glm::vec3(0);
 			}
 		}
 
@@ -124,9 +124,9 @@ void Game::Update(float dt) {
 
 void Game::Render() {
 	for (GameObject& ball : balls) {
-		ball.Render.Draw(*renderer);
+		ball.Render->Draw(*renderer);
 	}
-	container->Render.Draw(*renderer);
+	container->Render->Draw(*renderer);
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {

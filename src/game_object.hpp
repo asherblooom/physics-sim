@@ -20,8 +20,8 @@ public:
 			   glm::vec3 color = glm::vec3(1));
 
 	std::unique_ptr<Transform> transform;
-	RenderObject Render;
-	PhysObject Physics;
+	std::unique_ptr<RenderObject> Render;
+	std::unique_ptr<PhysObject> Physics;
 	std::unique_ptr<CollisionVolume> BoundingVolume;
 };
 
