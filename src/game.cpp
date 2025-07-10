@@ -29,6 +29,9 @@ void Game::Init() {
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
 	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, planeTex);
+	// plane texture is 20 pixels high
+	float ymult = 20.0f / height;
+	container->BoundingVolume->SizeMultiplier.y = ymult;
 }
 
 void Game::ProcessInput(float dt) {
@@ -69,7 +72,8 @@ void Game::ProcessInput(float dt) {
 	}
 }
 
-//TODO: make movement fps independent!!!
+// TODO: make movement fps independent!!!
+// FIXME: stop rendering/updating balls once they leave the frame!!
 void Game::Update(float dt) {
 	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {

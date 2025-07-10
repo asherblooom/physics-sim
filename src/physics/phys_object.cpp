@@ -10,6 +10,4 @@ void PhysObject::ResolveForces(float dt) {
 	// so we need to scale it up
 	// TODO: think of a better way to do this??
 	transform.Position += (velocity * dt) * 30.0f;
-
-	// FIXME: stop rendering/updating balls once they leave the frame!!
 }

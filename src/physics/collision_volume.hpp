@@ -27,12 +27,13 @@ public:
 
 	virtual bool DetectMouseOver(glm::vec2 mousePos) = 0;
 
+	virtual glm::vec2 getCenter() = 0;
+
 	virtual ~CollisionVolume() {}
 
 protected:
 	Transform& transform;
 	CollisionVolume(VolumeType type, Transform& parentTransform);
-	virtual glm::vec2 getCenter() = 0;
 };
 
 class CircleVolume : public CollisionVolume {
@@ -47,11 +48,10 @@ public:
 
 	bool DetectMouseOver(glm::vec2 mousePos) override;
 
-	~CircleVolume() {}
-
-private:
 	float getRadius();
 	glm::vec2 getCenter() override;
+
+	~CircleVolume() {}
 };
 
 class AABBVolume : public CollisionVolume {
@@ -66,10 +66,10 @@ public:
 
 	bool DetectMouseOver(glm::vec2 mousePos) override;
 
-	~AABBVolume() {}
-
-private:
+	glm::vec2 getDimensions();
 	glm::vec2 getCenter() override;
+
+	~AABBVolume() {}
 };
 
 #endif
