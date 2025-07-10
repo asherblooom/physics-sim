@@ -31,25 +31,9 @@ public:
 	void ClearForces() { force = glm::vec3(0); }
 	void ClearVelocity() { velocity = glm::vec3(0); }
 
-protected:
+private:
 	glm::vec2 velocity, force;
-	Transform* transform;
+	Transform& transform;
 };
-
-// // a ball object
-// class Ball : public PhysObject {
-// public:
-// 	const float Radius;
-// 	Ball(glm::vec2 position, float diameter = 1.0f, float mass = 1.0f, glm::vec3 color = glm::vec3(1.0f), glm::vec2 velocity = glm::vec2(0.0f));
-// };
-//
-// // a plane object
-// class Plane : public PhysObject {
-// public:
-// 	const glm::vec2 Normal;
-// 	float Distance = 0;	 //??
-// 	float Length;
-// 	Plane(glm::vec2 position, glm::vec2 normal, float length, glm::vec3 color = glm::vec3(1.0f));
-// };
 
 #endif

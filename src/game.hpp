@@ -18,7 +18,7 @@ private:
 	GameObject* container;
 	// stores a pointer to the ball in the balls vector when said ball is hovered over
 	// set to nullptr if no ball is hovered over
-	GameObject* selectedBall;
+	GameObject* selectedBall = nullptr;
 
 	GameObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 

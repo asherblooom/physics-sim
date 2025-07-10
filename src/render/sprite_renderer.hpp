@@ -5,7 +5,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 #include "shader.hpp"
 #include "texture.hpp"
@@ -16,7 +15,6 @@ public:
 	~SpriteRenderer();
 	// Renders a defined quad textured with given sprite
 	void DrawSprite(const Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color);
-	void hi() { std::cout << "hi"; }
 
 private:
 	// Render state

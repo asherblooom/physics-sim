@@ -12,12 +12,11 @@ class RenderObject {
 public:
 	glm::vec3 Color;
 
-	void Draw();
-	RenderObject(Transform& parentTransform, SpriteRenderer& renderer, Texture2D texture, glm::vec3 color);
+	void Draw(SpriteRenderer& renderer);
+	RenderObject(Transform& parentTransform, Texture2D texture, glm::vec3 color);
 
 private:
-	Transform* transform;
-	SpriteRenderer* renderer;
+	Transform& transform;
 	Texture2D texture;
 };
 

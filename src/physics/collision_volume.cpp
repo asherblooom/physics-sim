@@ -7,7 +7,7 @@ CollisionVolume::CollisionVolume(VolumeType type, Transform& parentTransform)
 	  PositionOffset{glm::vec2(0)},
 	  RotationOffset{0},
 	  SizeMultiplier{glm::vec2(1)},
-	  transform{&parentTransform} {};
+	  transform{parentTransform} {};
 CircleVolume::CircleVolume(Transform& parentTransform)
 	: CollisionVolume{CIRCLE, parentTransform} {}
 AABBVolume::AABBVolume(Transform& parentTransform)
@@ -51,15 +51,15 @@ bool AABBVolume::DetectMouseOver(glm::vec2 mousePos) {
 }
 
 float CircleVolume::getRadius() {
-	float radius = transform->Size.x >= transform->Size.y ? transform->Size.x / 2 : transform->Size.y / 2;
+	float radius = transform.Size.x >= transform.Size.y ? transform.Size.x / 2 : transform.Size.y / 2;
 	float multipliedRadius = SizeMultiplier.x >= SizeMultiplier.y ? radius * SizeMultiplier.x : radius * SizeMultiplier.y;
 	return multipliedRadius;
 }
 glm::vec2 CircleVolume::getCenter() {
-	return transform->Position + PositionOffset + getRadius();
+	return transform.Position + PositionOffset + getRadius();
 }
 glm::vec2 AABBVolume::getCenter() {
-	return transform->Position + PositionOffset + (transform->Size * SizeMultiplier);
+	return transform.Position + PositionOffset + (transform.Size * SizeMultiplier);
 }
 
 CollisionPoints detectAABBCircleCollision(AABBVolume& aabb, CircleVolume& circle) {

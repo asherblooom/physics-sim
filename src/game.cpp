@@ -26,10 +26,9 @@ void Game::Init() {
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 	ResourceManager::LoadTexture("plane", "textures/plane.dds");
 
-	//TODO: initialise bounding boxes???
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
-	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, *renderer, planeTex);
+	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, planeTex);
 }
 
 void Game::ProcessInput(float dt) {
@@ -74,7 +73,7 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		selectedBall->transform.Position += ChangeInMousePos;
+		selectedBall->transform->Position += ChangeInMousePos;
 		// make sure gravity and any other forces don't affect its position
 		selectedBall->Physics.ClearVelocity();
 	}
@@ -82,11 +81,10 @@ void Game::Update(float dt) {
 	std::vector<CollisionInfo> collisions;
 	if (balls.size() > 0) {
 		// move balls[0]
-		auto& ball = balls[0];
-		if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-			// ball.Physics.AddForce(gravity * ball.Mass);
-			ball.Physics.ResolveForces(dt);
-			ball.Physics.ClearForces();
+		if (!(&balls[0] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+			balls[0].Physics.AddForce(gravity * balls[0].Physics.Mass);
+			balls[0].Physics.ResolveForces(dt);
+			balls[0].Physics.ClearForces();
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
@@ -95,11 +93,10 @@ void Game::Update(float dt) {
 					// move every ball from balls[1] to balls[size]
 					// only moved if i == 0 as we only want to move balls once (on first iteration)
 					if (i == 0) {
-						auto& ball = balls[j];
-						if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-							// ball.Physics.AddForce(gravity * ball.Mass);
-							ball.Physics.ResolveForces(dt);
-							ball.Physics.ClearForces();
+						if (!(&balls[j] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+							balls[j].Physics.AddForce(gravity * balls[j].Physics.Mass);
+							balls[j].Physics.ResolveForces(dt);
+							balls[j].Physics.ClearForces();
 						}
 					}
 					// check collisions
@@ -115,7 +112,7 @@ void Game::Update(float dt) {
 				collisions.emplace_back(&balls[i], container, points);
 			}
 			// TODO: extend bounding tubes here
-			for (auto collision : collisions) {
+			for (CollisionInfo collision : collisions) {
 				collision.A->Render.Color = glm::vec3(0);
 				collision.B->Render.Color = glm::vec3(0);
 			}
@@ -126,18 +123,16 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-	for (auto& ball : balls) {
-		ball.Render.Draw();
+	for (GameObject& ball : balls) {
+		ball.Render.Draw(*renderer);
 	}
-	container->Render.Draw();
+	container->Render.Draw(*renderer);
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
 	auto ballTex = ResourceManager::GetTexture("ball");
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
-	auto ball = GameObject(pos, glm::vec2(diameter), CIRCLE, *renderer, ballTex, 1.0f, velocity, color);
-	balls.push_back(std::move(ball));
-	// balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, *renderer, ballTex, 1.0f, velocity, color);
+	balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, 1.0f, velocity, color);
 	return balls.back();
 }

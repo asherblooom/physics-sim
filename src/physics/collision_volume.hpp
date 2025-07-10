@@ -30,7 +30,7 @@ public:
 	virtual ~CollisionVolume() {}
 
 protected:
-	Transform* transform;
+	Transform& transform;
 	CollisionVolume(VolumeType type, Transform& parentTransform);
 	virtual glm::vec2 getCenter() = 0;
 };
