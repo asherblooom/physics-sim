@@ -21,14 +21,15 @@ void Game::Init() {
 	spriteShader.SetInteger("image", 0);
 	spriteShader.SetMatrix4("projection", projection);
 	// set render-specific controls
-	renderer = new SpriteRenderer(spriteShader);
+	renderer = new SpriteRenderer();
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 	ResourceManager::LoadTexture("plane", "textures/plane.dds");
 
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
-	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, planeTex);
+	auto planeShader = ResourceManager::GetShader("sprite");
+	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, planeTex, planeShader);
 	// plane texture is 20 pixels high
 	float ymult = 20.0f / height;
 	container->BoundingVolume->SizeMultiplier.y = ymult;
@@ -86,9 +87,7 @@ void Game::Update(float dt) {
 	if (balls.size() > 0) {
 		// move balls[0]
 		if (!(&balls[0] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-			balls[0].Physics->AddForce(gravity * balls[0].Physics->Mass);
 			balls[0].Physics->ResolveForces(dt);
-			balls[0].Physics->ClearForces();
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
@@ -98,9 +97,7 @@ void Game::Update(float dt) {
 					// only moved if i == 0 as we only want to move balls once (on first iteration)
 					if (i == 0) {
 						if (!(&balls[j] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-							balls[j].Physics->AddForce(gravity * balls[j].Physics->Mass);
 							balls[j].Physics->ResolveForces(dt);
-							balls[j].Physics->ClearForces();
 						}
 					}
 					// check collisions
@@ -128,15 +125,16 @@ void Game::Update(float dt) {
 
 void Game::Render() {
 	for (GameObject& ball : balls) {
-		ball.Render->Draw(*renderer);
+		renderer->DrawSprite(*ball.Render);
 	}
-	container->Render->Draw(*renderer);
+	renderer->DrawSprite(*container->Render);
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
 	auto ballTex = ResourceManager::GetTexture("ball");
+	auto ballShader = ResourceManager::GetShader("sprite");
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
-	balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, 1.0f, velocity, color);
+	balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
 	return balls.back();
 }

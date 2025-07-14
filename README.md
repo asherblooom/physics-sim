@@ -11,6 +11,7 @@
 
 ###
 
+- [ ] add capsule colliders and ability to sweep bounding volumes
 - [ ] add rotation stuff
 - [ ] add elactisity/bounciness??
 

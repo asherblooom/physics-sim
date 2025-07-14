@@ -17,18 +17,23 @@ struct CollisionInfo {
 // a general object that can be manipulated by the physics engine
 class PhysObject {
 public:
-	float Mass;
+	// stores 1/Mass for quicker calculations
+	float InverseMass;
+	bool HasGravity = true;
+	// a static object never moves but can be collided with
+	bool Static = false;
+	// a trigger registers collisions but there is no collision response
+	// (objects can move through a trigger)
+	bool Trigger = false;
 
 	PhysObject(Transform& parentTransform, float mass, glm::vec2 velocity);
 
-	void AddForce(glm::vec2 force) {
-		this->force.x += force.x;
-		// down is +ve y, up is moving towards y=0 (so -ve y)
-		this->force.y += -force.y;
-	}
+	void AddForce(glm::vec2 force);
+
 	// will update position based on forces added
-	void ResolveForces(float dt);
-	void ClearForces() { force = glm::vec3(0); }
+	// contains default values for gravity and damping
+	void ResolveForces(float dt, glm::vec2 gravity = {0, -9.81}, float dampingFactor = 0.9f);
+
 	void ClearVelocity() { velocity = glm::vec3(0); }
 
 private:
