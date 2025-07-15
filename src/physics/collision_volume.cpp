@@ -18,16 +18,16 @@ AABBVolume::AABBVolume(Transform& parentTransform)
 //------------collision detection functions
 CollisionPoints CircleVolume::DetectCircleCollision(CircleVolume& c) {
 	float radii = this->getRadius() + c.getRadius();
-	glm::vec2 delta = c.getCenter() - this->getCenter();
+	glm::vec2 delta = this->getCenter() - c.getCenter();
 	float deltaLength = glm::length(delta);
 
 	if (deltaLength < radii) {
-		float penetration = (radii - deltaLength);
+		float depth = (radii - deltaLength);
 		glm::vec2 normal = glm::normalize(delta);
 		glm::vec2 localA = normal * this->getRadius();
 		glm::vec2 localB = -normal * c.getRadius();
 
-		return {localA, localB, normal, penetration, true};
+		return {localA, localB, normal, depth, true};
 	}
 	return {glm::vec2(0), glm::vec2(0), glm::vec2(0), 0, false};
 }
@@ -42,22 +42,25 @@ CollisionPoints AABBVolume::DetectCircleCollision(CircleVolume& c) {
 }
 CollisionPoints detectAABBCircleCollision(AABBVolume& aabb, CircleVolume& circle) {
 	glm::vec2 boxSize = aabb.getDimensions() / 2.0f;
-
-	glm::vec2 delta = circle.getCenter() - aabb.getCenter();
-
-	glm::vec2 closestPointOnBox = glm::clamp(delta, -boxSize, boxSize);
-
-	glm::vec2 localPoint = delta - closestPointOnBox;
-	float distance = glm::length(localPoint);
+	glm::vec2 centerDst = circle.getCenter() - aabb.getCenter();
+	glm::vec2 clampDst = glm::clamp(centerDst, -boxSize, boxSize);
+	glm::vec2 closestPoint = aabb.getCenter() + clampDst;
+	// if this is 0, normal calculation does not work!
+	glm::vec2 mycalc = closestPoint - circle.getCenter();
+	float distance = glm::length(mycalc);
 
 	if (distance < circle.getRadius()) {
-		glm::vec2 collisionNormal = glm::normalize(localPoint);
-		float penetration = (circle.getRadius() - distance);
+		glm::vec2 collisionNormal;
+		if (mycalc == glm::vec2(0))
+			collisionNormal = glm::vec2(0, 1);
+		else
+			collisionNormal = glm::normalize(mycalc);
+		float depth = (circle.getRadius() - distance);
 
 		glm::vec2 localA = glm::vec2();
 		glm::vec2 localB = -collisionNormal * circle.getRadius();
 
-		return {localA, localB, collisionNormal, penetration, true};
+		return {localA, localB, collisionNormal, depth, true};
 	}
 	return {glm::vec2(0), glm::vec2(0), glm::vec2(0), 0, false};
 }

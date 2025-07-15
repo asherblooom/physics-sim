@@ -29,10 +29,11 @@ void Game::Init() {
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
 	auto planeShader = ResourceManager::GetShader("sprite");
-	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, planeTex, planeShader);
+	container = new GameObject(glm::vec2(0, -20), glm::vec2(width, height), AABB, planeTex, planeShader);
 	// plane texture is 20 pixels high
 	float ymult = 20.0f / height;
 	container->BoundingVolume->SizeMultiplier.y = ymult;
+	container->Physics->Static = true;
 }
 
 void Game::ProcessInput(float dt) {
@@ -50,8 +51,10 @@ void Game::ProcessInput(float dt) {
 		// only want one ball per key press
 		Keys[GLFW_KEY_M] = false;
 	}
-	// if there is a selected ball and the mouse button is no longer held, deselect it
+	// if there is a selected ball and the mouse button is no longer held, make it react to forces
+	// if the mouse pointer is no longer over it, deselect it
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
+		selectedBall->Physics->Static = false;
 		if (!(selectedBall->BoundingVolume->DetectMouseOver(MousePos))) {
 			selectedBall->Render->Color -= glm::vec3(0.1);
 			selectedBall = nullptr;
@@ -80,14 +83,21 @@ void Game::Update(float dt) {
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		selectedBall->transform->Position += ChangeInMousePos;
 		// make sure gravity and any other forces don't affect its position
+		selectedBall->Physics->Static = true;
 		selectedBall->Physics->ClearVelocity();
 	}
+
+	// for (auto& ball : balls) {
+	// 	if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+	// 		ball.Physics->ResolveForces(dt);
+	// 	}
+	// }
 
 	std::vector<CollisionInfo> collisions;
 	if (balls.size() > 0) {
 		// move balls[0]
-		if (!(&balls[0] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-			balls[0].Physics->ResolveForces(dt);
+		if (!(&balls.at(0) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+			balls.at(0).Physics->ResolveForces(dt);
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
@@ -96,30 +106,30 @@ void Game::Update(float dt) {
 					// move every ball from balls[1] to balls[size]
 					// only moved if i == 0 as we only want to move balls once (on first iteration)
 					if (i == 0) {
-						if (!(&balls[j] == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-							balls[j].Physics->ResolveForces(dt);
+						if (!(&balls.at(j) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+							balls.at(j).Physics->ResolveForces(dt);
 						}
 					}
 					// check collisions
-					CollisionPoints points = balls[i].BoundingVolume->DetectCollision(*balls[j].BoundingVolume);
+					if (i == j) continue;
+					CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*balls.at(j).BoundingVolume);
 					if (points.HasCollision) {
-						collisions.emplace_back(&balls[i], &balls[j], points);
+						collisions.emplace_back(&balls.at(i), &balls.at(j), points);
 					}
 				}
 			}
 			// collide with container
-			CollisionPoints points = balls[i].BoundingVolume->DetectCollision(*container->BoundingVolume);
+			CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*container->BoundingVolume);
 			if (points.HasCollision) {
-				collisions.emplace_back(&balls[i], container, points);
+				collisions.emplace_back(&balls.at(i), container, points);
 			}
-			// TODO: extend bounding tubes here
-			for (CollisionInfo collision : collisions) {
-				collision.A->Render->Color = glm::vec3(0);
-				collision.B->Render->Color = glm::vec3(0);
-			}
+			// TODO: extend bounding tubes here???
 		}
 
 		//solve collisions
+		for (auto collision : collisions) {
+			collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
+		}
 	}
 }
 
@@ -135,6 +145,18 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 	auto ballShader = ResourceManager::GetShader("sprite");
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
-	balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
+
+	if (selectedBall) {
+		int selectedLoc = 0;
+		for (int i = 0; i < (int)balls.size(); i++) {
+			if (&balls.at(i) == selectedBall) {
+				selectedLoc = i;
+				selectedBall = nullptr;
+			}
+		}
+		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
+		selectedBall = &balls.at(selectedLoc);
+	} else
+		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
 	return balls.back();
 }

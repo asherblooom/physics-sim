@@ -1,4 +1,5 @@
 #include "phys_object.hpp"
+#include <iostream>
 
 PhysObject::PhysObject(Transform& parentTransform, float mass, glm::vec2 velocity)
 	: InverseMass{1 / mass}, velocity{velocity.x, -velocity.y}, transform{parentTransform} {}
@@ -26,4 +27,19 @@ void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor)
 	float damping = powf(dampingFactor, dt);
 	velocity *= damping;
 	force = glm::vec2(0, 0);
+}
+
+void PhysObject::ResolveCollision(PhysObject& other, CollisionPoints points) {
+	// TODO: static!
+	if (other.Static) {
+		this->transform.Position -= points.Normal * points.Depth;
+	} else if (this->Static) {
+		other.transform.Position += points.Normal * points.Depth;
+	} else {
+		float totalMass = this->InverseMass + other.InverseMass;
+		this->transform.Position -= points.Normal * points.Depth * (this->InverseMass / totalMass);
+		other.transform.Position += points.Normal * points.Depth * (other.InverseMass / totalMass);
+	}
+	// this->velocity = glm::vec2(0);
+	// other.velocity = glm::vec2(0);
 }

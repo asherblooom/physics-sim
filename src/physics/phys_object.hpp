@@ -34,6 +34,7 @@ public:
 	// contains default values for gravity and damping
 	void ResolveForces(float dt, glm::vec2 gravity = {0, -9.81}, float dampingFactor = 0.9f);
 
+	void ResolveCollision(PhysObject& other, CollisionPoints points);
 	void ClearVelocity() { velocity = glm::vec3(0); }
 
 private:
