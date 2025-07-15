@@ -22,9 +22,6 @@ public:
 	bool HasGravity = true;
 	// a static object never moves but can be collided with
 	bool Static = false;
-	// a trigger registers collisions but there is no collision response
-	// (objects can move through a trigger)
-	bool Trigger = false;
 
 	PhysObject(Transform& parentTransform, float mass, glm::vec2 velocity);
 
