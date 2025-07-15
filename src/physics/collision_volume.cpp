@@ -46,16 +46,16 @@ CollisionPoints detectAABBCircleCollision(AABBVolume& aabb, CircleVolume& circle
 	glm::vec2 clampDst = glm::clamp(centerDst, -boxSize, boxSize);
 	glm::vec2 closestPoint = aabb.getCenter() + clampDst;
 	// if this is 0, normal calculation does not work!
-	glm::vec2 mycalc = closestPoint - circle.getCenter();
-	float distance = glm::length(mycalc);
+	glm::vec2 distance = closestPoint - circle.getCenter();
+	float dstLen = glm::length(distance);
 
-	if (distance < circle.getRadius()) {
+	if (dstLen < circle.getRadius()) {
 		glm::vec2 collisionNormal;
-		if (mycalc == glm::vec2(0))
+		if (distance == glm::vec2(0))  // TODO: this is a very rough fix - improve?
 			collisionNormal = glm::vec2(0, 1);
 		else
-			collisionNormal = glm::normalize(mycalc);
-		float depth = (circle.getRadius() - distance);
+			collisionNormal = glm::normalize(distance);
+		float depth = (circle.getRadius() - dstLen);
 
 		glm::vec2 localA = glm::vec2();
 		glm::vec2 localB = -collisionNormal * circle.getRadius();
