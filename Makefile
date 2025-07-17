@@ -1,7 +1,7 @@
 TARGET_EXEC := phys-sim
 CXX:=g++
 LIB_DIR:=lib
-CXXFLAGS:=-I$(LIB_DIR) -Wall -Wextra -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -std=c++20
+CXXFLAGS:=-I$(LIB_DIR) -Wall -Wextra -Wno-unused-parameter -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -std=c++20
 OBJ_DIR:=./obj
 SRC_DIR:=./src
 

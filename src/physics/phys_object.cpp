@@ -42,4 +42,5 @@ void PhysObject::ResolveCollision(PhysObject& other, CollisionPoints points) {
 	}
 	// this->velocity = glm::vec2(0);
 	// other.velocity = glm::vec2(0);
+	// TODO: if position below bounds, fix it!!
 }
