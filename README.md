@@ -1,5 +1,9 @@
 # physics-sim
 
+https://chocolive24.github.io/blog/the-optimisations-i-made-to-my-2d-c-physics-engine/
+https://dev.to/painkiller/2d-physics-engine-with-c-208l
+https://johanhelsing.studio/posts/bevy-xpbd/
+
 ## TODO
 
 - [ ] fix all in-code todos
@@ -23,3 +27,5 @@
 ###
 
 - [ ] add sand feature + maybe fluid feature?
+- [ ] 3d???
+
