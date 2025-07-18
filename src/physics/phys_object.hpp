@@ -19,6 +19,7 @@ class PhysObject {
 public:
 	// stores 1/Mass for quicker calculations
 	float InverseMass;
+	float Elasticity = 0.8f;
 	bool HasGravity = true;
 	// a static object never moves but can be collided with
 	bool Static = false;

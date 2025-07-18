@@ -48,8 +48,8 @@ void PhysObject::ResolveCollision(PhysObject& other, CollisionPoints points) {
 
 	//calculate impulse
 	glm::vec2 relativeVelocity = this->velocity - other.velocity;
-	float cRestitution = 0.66f;
-	float totalVelocity = glm::dot(-(1.0f + cRestitution) * relativeVelocity, points.Normal);
+	float coefficientRestitution = this->Elasticity * other.Elasticity;
+	float totalVelocity = glm::dot(-(1.0f + coefficientRestitution) * relativeVelocity, points.Normal);
 	float impulse = totalVelocity / totalMass;
 	glm::vec2 impulseVec = impulse * points.Normal;
 
