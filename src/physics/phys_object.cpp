@@ -11,8 +11,8 @@ void PhysObject::AddForce(glm::vec2 force) {
 }
 
 void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor) {
-	if (Static) InverseMass = 0.0f;
-	// if (Static) return;
+	// if (Static) InverseMass = 0.0f;
+	if (Static) return;
 
 	glm::vec2 acceleration = force * InverseMass;
 	gravity.y = -gravity.y;
@@ -31,25 +31,30 @@ void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor)
 }
 
 void PhysObject::ResolveCollision(PhysObject& other, CollisionPoints points) {
-	// TODO: static!
-	if (other.Static) other.InverseMass = 0;
-	float totalMass = this->InverseMass + other.InverseMass;
-	// if (other.Static) {
-	// 	this->transform.Position -= points.Normal * points.Depth;
-	// } else if (this->Static) {
-	// 	other.transform.Position += points.Normal * points.Depth;
-	// } else {
-	this->transform.Position -= points.Normal * points.Depth * (this->InverseMass / totalMass);
-	other.transform.Position += points.Normal * points.Depth * (other.InverseMass / totalMass);
-	// }
+	// if both are static, just move each 0.5 up/down so as to separate them and return
+	if (this->Static && other.Static) {
+		this->transform.Position -= points.Normal * points.Depth * 0.5f;
+		other.transform.Position += points.Normal * points.Depth * 0.5f;
+		return;
+	}
+	// if object is static then give it infinite mass (1/inf = 0)
+	float invMassA = 0, invMassB = 0;
+	if (!this->Static) invMassA = this->InverseMass;
+	if (!other.Static) invMassB = other.InverseMass;
 
+	// separate the objects
+	float totalMass = invMassA + invMassB;
+	this->transform.Position -= points.Normal * points.Depth * (invMassA / totalMass);
+	other.transform.Position += points.Normal * points.Depth * (invMassB / totalMass);
+
+	//calculate impulse
 	glm::vec2 relativeVelocity = this->velocity - other.velocity;
 	float cRestitution = 0.66f;
 	float totalVelocity = glm::dot(-(1.0f + cRestitution) * relativeVelocity, points.Normal);
 	float impulse = totalVelocity / totalMass;
-
 	glm::vec2 impulseVec = impulse * points.Normal;
 
-	this->velocity += impulseVec * this->InverseMass;
-	other.velocity -= impulseVec * other.InverseMass;
+	// apply impulse
+	this->velocity += impulseVec * invMassA;
+	other.velocity -= impulseVec * invMassB;
 }

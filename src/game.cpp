@@ -51,10 +51,8 @@ void Game::ProcessInput(float dt) {
 		// only want one ball per key press
 		Keys[GLFW_KEY_M] = false;
 	}
-	// if there is a selected ball and the mouse button is no longer held, make it react to forces
-	// if the mouse pointer is no longer over it, deselect it
+	// if there is a selected ball and the mouse pointer is no longer over it, deselect it
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		selectedBall->Physics->Static = false;
 		if (!(selectedBall->BoundingVolume->DetectMouseOver(MousePos))) {
 			selectedBall->Render->Color -= glm::vec3(0.1);
 			selectedBall = nullptr;
@@ -83,7 +81,6 @@ void Game::Update(float dt) {
 	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
 		selectedBall->transform->Position += ChangeInMousePos;
 		// make sure gravity and any other forces don't affect its position
-		selectedBall->Physics->Static = true;
 		selectedBall->Physics->ClearVelocity();
 	}
 
