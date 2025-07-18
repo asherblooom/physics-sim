@@ -13,17 +13,17 @@
 - [ ] improve ball-on-ball collision/interaction when dragged
   - [ ] change force/velocity when ball dragged?
   - [ ] allow mouse to fling balls?
-
-###
-
-- [ ] add capsule colliders and ability to sweep bounding volumes
-- [ ] add rotation stuff?
-- [ ] add ability to spawn other objects?
-
+     
 ###
 
 - [ ] improve ball rendering - add ability to change radius etc.
 - [ ] add imgui
+- [ ] add capsule colliders and ability to sweep bounding volumes
+
+###
+
+- [ ] add rotation stuff?
+- [ ] add ability to spawn other objects?
 
 ###
 
