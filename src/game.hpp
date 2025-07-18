@@ -29,7 +29,6 @@ public:
 	glm::vec2 ChangeInMousePos;
 	Game(unsigned int width, unsigned int height);
 	~Game() {
-		// delete container;
 		delete renderer;
 		ResourceManager::Clear();
 	}

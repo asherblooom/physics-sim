@@ -24,13 +24,19 @@ void Game::Init() {
 	renderer = new SpriteRenderer();
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
-	ResourceManager::LoadTexture("plane", "textures/plane.dds");
+	ResourceManager::LoadTexture("plane-h", "textures/plane-h.dds");
+	ResourceManager::LoadTexture("plane-v", "textures/plane-v.dds");
 
 	//TODO: add another constructor for static objects
-	auto planeTex = ResourceManager::GetTexture("plane");
+	auto planeTexH = ResourceManager::GetTexture("plane-h");
+	auto planeTexV = ResourceManager::GetTexture("plane-v");
 	auto planeShader = ResourceManager::GetShader("sprite");
-	container = new GameObject(glm::vec2(0, height - 40), glm::vec2(width, 20), AABB, planeTex, planeShader);
-	container->Physics->Static = true;
+	container.emplace_back(glm::vec2(0, height - 40), glm::vec2(width, 20), AABB, planeTexH, planeShader);
+	container.emplace_back(glm::vec2(0, height / 3.0f - 20), glm::vec2(20, height * (2.0f / 3.0f)), AABB, planeTexV, planeShader);
+	container.emplace_back(glm::vec2(width - 20, height / 3.0f - 20), glm::vec2(20, height * (2.0f / 3.0f)), AABB, planeTexV, planeShader);
+	for (GameObject& c : container) {
+		c.Physics->Static = true;
+	}
 }
 
 void Game::ProcessInput(float dt) {
@@ -107,15 +113,17 @@ void Game::Update(float dt) {
 				}
 			}
 			// collide with container
-			CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*container->BoundingVolume);
-			if (points.HasCollision) {
-				collisions.emplace_back(&balls.at(i), container, points);
+			for (GameObject& c : container) {
+				CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*c.BoundingVolume);
+				if (points.HasCollision) {
+					collisions.emplace_back(&balls.at(i), &c, points);
+				}
 			}
 			// TODO: extend bounding tubes here???
 		}
 
 		//solve collisions
-		for (auto collision : collisions) {
+		for (CollisionInfo collision : collisions) {
 			collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
 		}
 	}
@@ -125,7 +133,9 @@ void Game::Render() {
 	for (GameObject& ball : balls) {
 		renderer->DrawSprite(*ball.Render);
 	}
-	renderer->DrawSprite(*container->Render);
+	for (GameObject& c : container) {
+		renderer->DrawSprite(*c.Render);
+	}
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
