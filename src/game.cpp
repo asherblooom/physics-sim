@@ -93,13 +93,15 @@ void Game::Update(float dt) {
 	// 	}
 	// }
 
+	int heightDiff = 25;
+
 	std::vector<CollisionInfo> collisions;
 	if (balls.size() > 0) {
 		// move balls[0]
 		if (!(&balls.at(0) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
 			balls.at(0).Physics->ResolveForces(dt);
-			if (balls.at(0).transform->Position.y + balls.at(0).transform->Size.y > height - 19) {
-				balls.at(0).transform->Position.y = height - 19 - balls.at(0).transform->Size.y;
+			if (balls.at(0).transform->Position.y + balls.at(0).transform->Size.y > height - heightDiff) {
+				balls.at(0).transform->Position.y = height - heightDiff - balls.at(0).transform->Size.y;
 			}
 		}
 		// for each distinct pair of balls
@@ -111,8 +113,8 @@ void Game::Update(float dt) {
 					if (i == 0) {
 						if (!(&balls.at(j) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
 							balls.at(j).Physics->ResolveForces(dt);
-							if (balls.at(j).transform->Position.y + balls.at(j).transform->Size.y > height - 19) {
-								balls.at(j).transform->Position.y = height - 19 - balls.at(j).transform->Size.y;
+							if (balls.at(j).transform->Position.y + balls.at(j).transform->Size.y > height - heightDiff) {
+								balls.at(j).transform->Position.y = height - heightDiff - balls.at(j).transform->Size.y;
 							}
 						}
 					}
@@ -137,13 +139,13 @@ void Game::Update(float dt) {
 			collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
 			// only set boundaries on balls
 			if (collision.A != container) {
-				if (collision.A->transform->Position.y + collision.A->transform->Size.y > height - 19) {
-					collision.A->transform->Position.y = height - 19 - collision.A->transform->Size.y;
+				if (collision.A->transform->Position.y + collision.A->transform->Size.y > height - heightDiff) {
+					collision.A->transform->Position.y = height - heightDiff - collision.A->transform->Size.y;
 				}
 			}
 			if (collision.B != container) {
-				if (collision.B->transform->Position.y + collision.B->transform->Size.y > height - 19) {
-					collision.B->transform->Position.y = height - 19 - collision.B->transform->Size.y;
+				if (collision.B->transform->Position.y + collision.B->transform->Size.y > height - heightDiff) {
+					collision.B->transform->Position.y = height - heightDiff - collision.B->transform->Size.y;
 				}
 			}
 		}

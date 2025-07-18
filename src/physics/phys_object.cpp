@@ -11,7 +11,8 @@ void PhysObject::AddForce(glm::vec2 force) {
 }
 
 void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor) {
-	if (Static) return;
+	if (Static) InverseMass = 0.0f;
+	// if (Static) return;
 
 	glm::vec2 acceleration = force * InverseMass;
 	gravity.y = -gravity.y;
@@ -31,16 +32,24 @@ void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor)
 
 void PhysObject::ResolveCollision(PhysObject& other, CollisionPoints points) {
 	// TODO: static!
-	if (other.Static) {
-		this->transform.Position -= points.Normal * points.Depth;
-	} else if (this->Static) {
-		other.transform.Position += points.Normal * points.Depth;
-	} else {
-		float totalMass = this->InverseMass + other.InverseMass;
-		this->transform.Position -= points.Normal * points.Depth * (this->InverseMass / totalMass);
-		other.transform.Position += points.Normal * points.Depth * (other.InverseMass / totalMass);
-	}
-	// this->velocity = glm::vec2(0);
-	// other.velocity = glm::vec2(0);
-	// TODO: if position below bounds, fix it!!
+	if (other.Static) other.InverseMass = 0;
+	float totalMass = this->InverseMass + other.InverseMass;
+	// if (other.Static) {
+	// 	this->transform.Position -= points.Normal * points.Depth;
+	// } else if (this->Static) {
+	// 	other.transform.Position += points.Normal * points.Depth;
+	// } else {
+	this->transform.Position -= points.Normal * points.Depth * (this->InverseMass / totalMass);
+	other.transform.Position += points.Normal * points.Depth * (other.InverseMass / totalMass);
+	// }
+
+	glm::vec2 relativeVelocity = this->velocity - other.velocity;
+	float cRestitution = 0.66f;
+	float totalVelocity = glm::dot(-(1.0f + cRestitution) * relativeVelocity, points.Normal);
+	float impulse = totalVelocity / totalMass;
+
+	glm::vec2 impulseVec = impulse * points.Normal;
+
+	this->velocity += impulseVec * this->InverseMass;
+	other.velocity -= impulseVec * other.InverseMass;
 }
