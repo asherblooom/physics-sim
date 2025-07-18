@@ -1,5 +1,5 @@
 # physics-sim
-
+<https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/> \
 <https://chocolive24.github.io/blog/the-optimisations-i-made-to-my-2d-c-physics-engine/> \
 <https://dev.to/painkiller/2d-physics-engine-with-c-208l> \
 <https://johanhelsing.studio/posts/bevy-xpbd/>
