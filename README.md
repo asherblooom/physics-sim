@@ -18,6 +18,11 @@
 
 - [ ] improve ball rendering - add ability to change radius etc.
 - [ ] add imgui
+- [ ] improve stability
+
+###
+
+- [ ] add broad phase and narrow phase collision detection
 - [ ] add capsule colliders and ability to sweep bounding volumes
 
 ###
