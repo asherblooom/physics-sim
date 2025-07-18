@@ -29,10 +29,7 @@ void Game::Init() {
 	//TODO: add another constructor for static objects
 	auto planeTex = ResourceManager::GetTexture("plane");
 	auto planeShader = ResourceManager::GetShader("sprite");
-	container = new GameObject(glm::vec2(0, height / 2 - 20), glm::vec2(width, height), AABB, planeTex, planeShader);
-	// plane texture is 20 pixels high
-	float ymult = 20.0f / height;
-	container->BoundingVolume->SizeMultiplier.y = ymult;
+	container = new GameObject(glm::vec2(0, height - 40), glm::vec2(width, 20), AABB, planeTex, planeShader);
 	container->Physics->Static = true;
 }
 
@@ -84,22 +81,11 @@ void Game::Update(float dt) {
 		selectedBall->Physics->ClearVelocity();
 	}
 
-	// for (auto& ball : balls) {
-	// 	if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-	// 		ball.Physics->ResolveForces(dt);
-	// 	}
-	// }
-
-	int heightDiff = 25;
-
 	std::vector<CollisionInfo> collisions;
 	if (balls.size() > 0) {
 		// move balls[0]
 		if (!(&balls.at(0) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
 			balls.at(0).Physics->ResolveForces(dt);
-			if (balls.at(0).transform->Position.y + balls.at(0).transform->Size.y > height - heightDiff) {
-				balls.at(0).transform->Position.y = height - heightDiff - balls.at(0).transform->Size.y;
-			}
 		}
 		// for each distinct pair of balls
 		for (int i = 0; i < (int)balls.size(); i++) {
@@ -110,9 +96,6 @@ void Game::Update(float dt) {
 					if (i == 0) {
 						if (!(&balls.at(j) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
 							balls.at(j).Physics->ResolveForces(dt);
-							if (balls.at(j).transform->Position.y + balls.at(j).transform->Size.y > height - heightDiff) {
-								balls.at(j).transform->Position.y = height - heightDiff - balls.at(j).transform->Size.y;
-							}
 						}
 					}
 					// check collisions
@@ -134,17 +117,6 @@ void Game::Update(float dt) {
 		//solve collisions
 		for (auto collision : collisions) {
 			collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
-			// only set boundaries on balls
-			if (collision.A != container) {
-				if (collision.A->transform->Position.y + collision.A->transform->Size.y > height - heightDiff) {
-					collision.A->transform->Position.y = height - heightDiff - collision.A->transform->Size.y;
-				}
-			}
-			if (collision.B != container) {
-				if (collision.B->transform->Position.y + collision.B->transform->Size.y > height - heightDiff) {
-					collision.B->transform->Position.y = height - heightDiff - collision.B->transform->Size.y;
-				}
-			}
 		}
 	}
 }
