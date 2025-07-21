@@ -1,4 +1,7 @@
 # physics-sim
+<https://lisyarus.github.io/blog/posts/perfect-collisions.html>\
+<https://gdcvault.com/play/1020603/Physics-for-Game-Programmers-Understanding>
+
 <https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/> \
 <https://chocolive24.github.io/blog/the-optimisations-i-made-to-my-2d-c-physics-engine/> \
 <https://dev.to/painkiller/2d-physics-engine-with-c-208l> \
@@ -10,20 +13,23 @@
 
 ###
 
-- [ ] improve ball-on-ball collision/interaction when dragged
-  - [ ] change force/velocity when ball dragged?
-  - [ ] allow mouse to fling balls?
-     
-###
-
 - [ ] improve ball rendering - add ability to change radius etc.
 - [ ] add imgui
 - [ ] improve stability
+- [ ] add readme instructions
+- [ ] right click to spawn balls!
 
 ###
 
 - [ ] add broad phase and narrow phase collision detection
 - [ ] add capsule colliders and ability to sweep bounding volumes
+
+###
+
+- [ ] improve ball-on-ball collision/interaction when dragged
+  - [ ] change force/velocity when ball dragged?
+  - [ ] allow mouse to fling balls?
+- [ ] add better velocity/position solvers
 
 ###
 
