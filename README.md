@@ -15,7 +15,7 @@
 
 - [ ] improve ball rendering - add ability to change radius etc.
 - [ ] add imgui
-- [ ] improve stability
+- [x] improve stability
 - [ ] add readme instructions
 - [ ] right click to spawn balls!
 
