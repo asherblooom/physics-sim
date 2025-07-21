@@ -19,12 +19,11 @@
 - [ ] add readme instructions
 - [ ] right click to spawn balls!
 
-- [ ] write a 'what i learned' thing - iterations, optimising etc.
-
 ###
 
 - [ ] add broad phase and narrow phase collision detection
 - [ ] add capsule colliders and ability to sweep bounding volumes
+- [ ] write a 'what i learned' thing - iterations, optimising etc.
 
 ###
 
