@@ -86,45 +86,49 @@ void Game::Update(float dt) {
 		// make sure gravity and any other forces don't affect its position
 		selectedBall->Physics->ClearVelocity();
 	}
-
-	std::vector<CollisionInfo> collisions;
-	if (balls.size() > 0) {
-		// move balls[0]
-		if (!(&balls.at(0) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-			balls.at(0).Physics->ResolveForces(dt);
-		}
-		// for each distinct pair of balls
-		for (int i = 0; i < (int)balls.size(); i++) {
-			if (balls.size() > 1) {
-				for (int j = i + 1; j < (int)balls.size(); j++) {
-					// move every ball from balls[1] to balls[size]
-					// only moved if i == 0 as we only want to move balls once (on first iteration)
-					if (i == 0) {
-						if (!(&balls.at(j) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-							balls.at(j).Physics->ResolveForces(dt);
+	// repeat physics calulations 8 times to add stability
+	int subSteps = 8;
+	dt = dt / subSteps;
+	for (int i = 0; i < subSteps; i++) {
+		std::vector<CollisionInfo> collisions;
+		if (balls.size() > 0) {
+			// move balls[0]
+			if (!(&balls.at(0) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+				balls.at(0).Physics->ResolveForces(dt);
+			}
+			// for each distinct pair of balls
+			for (int i = 0; i < (int)balls.size(); i++) {
+				if (balls.size() > 1) {
+					for (int j = i + 1; j < (int)balls.size(); j++) {
+						// move every ball from balls[1] to balls[size]
+						// only moved if i == 0 as we only want to move balls once (on first iteration)
+						if (i == 0) {
+							if (!(&balls.at(j) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
+								balls.at(j).Physics->ResolveForces(dt);
+							}
+						}
+						// check collisions
+						if (i == j) continue;
+						CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*balls.at(j).BoundingVolume);
+						if (points.HasCollision) {
+							collisions.emplace_back(&balls.at(i), &balls.at(j), points);
 						}
 					}
-					// check collisions
-					if (i == j) continue;
-					CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*balls.at(j).BoundingVolume);
+				}
+				// collide with container
+				for (GameObject& c : container) {
+					CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*c.BoundingVolume);
 					if (points.HasCollision) {
-						collisions.emplace_back(&balls.at(i), &balls.at(j), points);
+						collisions.emplace_back(&balls.at(i), &c, points);
 					}
 				}
+				// TODO: extend bounding tubes here???
 			}
-			// collide with container
-			for (GameObject& c : container) {
-				CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*c.BoundingVolume);
-				if (points.HasCollision) {
-					collisions.emplace_back(&balls.at(i), &c, points);
-				}
-			}
-			// TODO: extend bounding tubes here???
-		}
 
-		//solve collisions
-		for (CollisionInfo collision : collisions) {
-			collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
+			//solve collisions
+			for (CollisionInfo collision : collisions) {
+				collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
+			}
 		}
 	}
 }
