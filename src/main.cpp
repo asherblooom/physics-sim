@@ -89,7 +89,7 @@ int main() {
 
 		// render
 		// ------
-		glClearColor(0.298, 0.831, 0.941, 1.0f);
+		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		physSim->Render();
 

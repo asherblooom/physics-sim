@@ -1,15 +1,13 @@
 #include "game.hpp"
 
 #include <GLFW/glfw3.h>
-#include <cstdlib>
+#include <algorithm>
 #include <iostream>
-#include <memory>
 #include "game_object.hpp"
 #include "resource_manager.hpp"
 
 Game::Game(unsigned int width, unsigned int height)
-	: width(width), height(height) {
-}
+	: width(width), height(height) {}
 
 void Game::Init() {
 	// load shaders
@@ -80,55 +78,25 @@ void Game::ProcessInput(float dt) {
 // TODO: make movement fps independent!!!
 // FIXME: stop rendering/updating balls once they leave the frame!!
 void Game::Update(float dt) {
-	// if there is a selected ball and the mouse is down, make it follow the mouse pointer
-	if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
-		selectedBall->transform->Position += ChangeInMousePos;
-		// make sure gravity and any other forces don't affect its position
-		selectedBall->Physics->ClearVelocity();
-	}
 	// repeat physics calulations 8 times to add stability
 	int subSteps = 8;
 	dt = dt / subSteps;
 	for (int i = 0; i < subSteps; i++) {
-		std::vector<CollisionInfo> collisions;
-		if (balls.size() > 0) {
-			// move balls[0]
-			if (!(&balls.at(0) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-				balls.at(0).Physics->ResolveForces(dt);
-			}
-			// for each distinct pair of balls
-			for (int i = 0; i < (int)balls.size(); i++) {
-				if (balls.size() > 1) {
-					for (int j = i + 1; j < (int)balls.size(); j++) {
-						// move every ball from balls[1] to balls[size]
-						// only moved if i == 0 as we only want to move balls once (on first iteration)
-						if (i == 0) {
-							if (!(&balls.at(j) == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT])) {
-								balls.at(j).Physics->ResolveForces(dt);
-							}
-						}
-						// check collisions
-						if (i == j) continue;
-						CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*balls.at(j).BoundingVolume);
-						if (points.HasCollision) {
-							collisions.emplace_back(&balls.at(i), &balls.at(j), points);
-						}
-					}
-				}
-				// collide with container
-				for (GameObject& c : container) {
-					CollisionPoints points = balls.at(i).BoundingVolume->DetectCollision(*c.BoundingVolume);
-					if (points.HasCollision) {
-						collisions.emplace_back(&balls.at(i), &c, points);
-					}
-				}
-				// TODO: extend bounding tubes here???
-			}
+		// if there is a selected ball and the mouse is down, make it follow the mouse pointer
+		if (selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
+			selectedBall->transform->Position += ChangeInMousePos / (float)subSteps;
+			// make sure gravity and any other forces don't affect its position
+			selectedBall->Physics->ClearVelocity();
+		}
 
-			//solve collisions
-			for (CollisionInfo collision : collisions) {
-				collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
-			}
+		for (GameObject& ball : balls) {
+			// if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]))
+			ball.Physics->ResolveForces(dt);
+		}
+		std::vector<CollisionInfo> collisions = sweepAndPruneCollisions(balls, container);
+		//solve collisions
+		for (CollisionInfo collision : collisions) {
+			collision.A->Physics->ResolveCollision(*collision.B->Physics, collision.points);
 		}
 	}
 }
@@ -150,7 +118,7 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 
 	if (selectedBall) {
 		int selectedLoc = 0;
-		for (int i = 0; i < (int)balls.size(); i++) {
+		for (size_t i = 0; i < balls.size(); i++) {
 			if (&balls.at(i) == selectedBall) {
 				selectedLoc = i;
 				selectedBall = nullptr;
@@ -160,5 +128,43 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 		selectedBall = &balls.at(selectedLoc);
 	} else
 		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
+	ballsIndex.emplace_back(balls.size() - 1);
 	return balls.back();
+}
+
+std::vector<CollisionInfo> Game::sweepAndPruneCollisions(std::vector<GameObject>& balls, std::vector<GameObject>& container) {
+	std::vector<CollisionInfo> collisions;
+
+	std::sort(ballsIndex.begin(), ballsIndex.end(),
+			  [&](uint i, uint j) { return (balls[j].transform->Position.x > balls[i].transform->Position.x); });
+
+	for (size_t i = 0; i < ballsIndex.size(); i++) {
+		GameObject& ball1 = balls[ballsIndex[i]];
+		for (size_t j = i + 1; j < ballsIndex.size(); j++) {
+			if (i == j) continue;
+
+			GameObject& ball2 = balls[ballsIndex[j]];
+			// if ball2 leftmost x-value > ball1 rightmost x-value, don't check for collision
+			if (ball2.transform->Position.x > ball1.transform->Position.x + ball1.transform->Size.x)
+				break;
+			// otherwise check
+			CollisionPoints points = ball1.BoundingVolume->DetectCollision(*ball2.BoundingVolume);
+			if (points.HasCollision)
+				collisions.emplace_back(&ball1, &ball2, points);
+		}
+		for (GameObject& c : container) {
+			// FIXME: improve this!
+
+			// if ball1 leftmost x-value > container rightmost x-value
+			// or ball1 rightmost < container leftmost, don't check for collision
+			// if (c.transform->Position.x > ball1.transform->Position.x + ball1.transform->Size.x ||
+			// 	c.transform->Position.x + c.transform->Size.x < ball1.transform->Position.x)
+			// 	continue;
+			// otherwise check
+			CollisionPoints points = ball1.BoundingVolume->DetectCollision(*c.BoundingVolume);
+			if (points.HasCollision)
+				collisions.emplace_back(&ball1, &c, points);
+		}
+	}
+	return collisions;
 }

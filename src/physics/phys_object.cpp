@@ -2,7 +2,7 @@
 #include <iostream>
 
 PhysObject::PhysObject(Transform& parentTransform, float mass, glm::vec2 velocity)
-	: InverseMass{1 / mass}, velocity{velocity.x, -velocity.y}, transform{parentTransform} {}
+	: Mass{mass}, InverseMass{1 / mass}, velocity{velocity.x, -velocity.y}, transform{parentTransform} {}
 
 void PhysObject::AddForce(glm::vec2 force) {
 	this->force.x += force.x;

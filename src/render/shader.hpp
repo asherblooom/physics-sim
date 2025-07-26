@@ -17,7 +17,7 @@ enum ShaderType {
 // Compiles from source code, generates compile/link-time error messages
 // and hosts several utility functions for easy management.
 class Shader {
-   public:
+public:
 	Shader() : ID_{glCreateProgram()} {}
 	// will compile and link the shaders from given source code
 	// geometry source code is optional
@@ -36,7 +36,7 @@ class Shader {
 	void SetVector4f(const char *name, const glm::vec4 &value, bool useShader = false);
 	void SetMatrix4(const char *name, const glm::mat4 &matrix, bool useShader = false);
 
-   private:
+private:
 	// program id
 	GLuint ID_;
 	// checks if compilation or linking failed and if so, print the error logs
