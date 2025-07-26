@@ -41,7 +41,7 @@ void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
 		makeBall(glm::vec2(width / 2, height / 10),
 				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
-				 glm::vec2(0, 0));
+				 glm::vec2(0));
 		// only want one ball per key press
 		Keys[GLFW_KEY_N] = false;
 	}
@@ -51,6 +51,13 @@ void Game::ProcessInput(float dt) {
 				 glm::vec2(-15, 15));
 		// only want one ball per key press
 		Keys[GLFW_KEY_M] = false;
+	}
+	if (MouseButtons[GLFW_MOUSE_BUTTON_RIGHT]) {
+		makeBall(glm::vec2(MousePos.x, MousePos.y),
+				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
+				 glm::vec2(0));
+		// only want one ball per press
+		MouseButtons[GLFW_MOUSE_BUTTON_RIGHT] = false;
 	}
 	// if there is a selected ball and the mouse pointer is no longer over it, deselect it
 	if (selectedBall && !MouseButtons[GLFW_MOUSE_BUTTON_LEFT]) {
@@ -153,14 +160,7 @@ std::vector<CollisionInfo> Game::sweepAndPruneCollisions(std::vector<GameObject>
 				collisions.emplace_back(&ball1, &ball2, points);
 		}
 		for (GameObject& c : container) {
-			// FIXME: improve this!
-
-			// if ball1 leftmost x-value > container rightmost x-value
-			// or ball1 rightmost < container leftmost, don't check for collision
-			// if (c.transform->Position.x > ball1.transform->Position.x + ball1.transform->Size.x ||
-			// 	c.transform->Position.x + c.transform->Size.x < ball1.transform->Position.x)
-			// 	continue;
-			// otherwise check
+			// TODO: improve efficiency of this!
 			CollisionPoints points = ball1.BoundingVolume->DetectCollision(*c.BoundingVolume);
 			if (points.HasCollision)
 				collisions.emplace_back(&ball1, &c, points);

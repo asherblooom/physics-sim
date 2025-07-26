@@ -1,4 +1,5 @@
 # physics-sim
+
 <https://lisyarus.github.io/blog/posts/perfect-collisions.html>\
 <https://gdcvault.com/play/1020603/Physics-for-Game-Programmers-Understanding>
 
@@ -17,7 +18,7 @@
 - [ ] add imgui
 - [x] improve stability
 - [ ] add readme instructions
-- [ ] right click to spawn balls!
+- [x] right click to spawn balls!
 
 ###
 
