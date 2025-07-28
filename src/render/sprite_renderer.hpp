@@ -16,9 +16,8 @@ public:
 	void DrawSprite(RenderObject& object);
 
 private:
-	// Render state
-	unsigned int quadVAO;
-	// Initializes and configures quadVAO
+	unsigned int VAO;
+	// Initializes and configures VAO
 	void initRenderData();
 };
 

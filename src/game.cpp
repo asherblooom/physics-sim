@@ -11,12 +11,15 @@ Game::Game(unsigned int width, unsigned int height)
 
 void Game::Init() {
 	// load shaders
-	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vs", "src/shaders/sprite.frag");
+	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vert", "src/shaders/sprite.frag");
+	ResourceManager::LoadShader("circle", "src/shaders/sprite.vert", "src/shaders/circle.frag");
 	// configure shaders
 	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 	Shader& spriteShader = ResourceManager::GetShader("sprite");
+	Shader& ballShader = ResourceManager::GetShader("circle");
+	ballShader.Use();
+	ballShader.SetMatrix4("projection", projection);
 	spriteShader.Use();
-	spriteShader.SetInteger("image", 0);
 	spriteShader.SetMatrix4("projection", projection);
 	// set render-specific controls
 	renderer = new SpriteRenderer();
@@ -119,7 +122,8 @@ void Game::Render() {
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
 	auto ballTex = ResourceManager::GetTexture("ball");
-	auto ballShader = ResourceManager::GetShader("sprite");
+	auto ballShader = ResourceManager::GetShader("circle");
+	ballShader.Use();
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
 

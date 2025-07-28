@@ -1,5 +1,14 @@
 #include "sprite_renderer.hpp"
 
+struct vertex {
+	// Position
+	float x;
+	float y;
+	// Texture coordinates
+	float s;
+	float t;
+};
+
 SpriteRenderer::SpriteRenderer() {
 	initRenderData();
 }
@@ -35,26 +44,31 @@ void SpriteRenderer::DrawSprite(RenderObject& object) {
 	glBindVertexArray(0);
 }
 
-void SpriteRenderer::initRenderData() {
-	struct vertex {
-		// Position
-		float x;
-		float y;
-		// Texture coordinates
-		float s;
-		float t;
-	};
+void DrawCircle(float cx, float cy, float r, int num_segments, vertex vertices[]) {
+	float theta = 2 * 3.1415926 / float(num_segments);
+	float c = cosf(theta);	//precalculate the sine and cosine
+	float s = sinf(theta);
+	float t;
 
+	float x = r;  //we start at angle = 0
+	float y = 0;
+
+	for (int i = 0; i < num_segments; i++) {
+		vertices[i] = {x + cx, y + cy, 0, 0};
+
+		//apply the rotation matrix
+		t = x;
+		x = c * x - s * y;
+		y = s * t + c * y;
+	}
+}
+
+void SpriteRenderer::initRenderData() {
 	// configure VAO/VBO
 	unsigned int VBO;
-	vertex vertices[] = {
-		{0.0f, 1.0f, 0.0f, 1.0f},
-		{1.0f, 0.0f, 1.0f, 0.0f},
-		{0.0f, 0.0f, 0.0f, 0.0f},
 
-		{0.0f, 1.0f, 0.0f, 1.0f},
-		{1.0f, 1.0f, 1.0f, 1.0f},
-		{1.0f, 0.0f, 1.0f, 0.0f}};
+	vertex vertices[16];
+	DrawCircle(0.5, 0.5, 0.5, 16, vertices);
 
 	// initialise VBO buffer and fill it with data from vertices
 	glGenBuffers(1, &VBO);

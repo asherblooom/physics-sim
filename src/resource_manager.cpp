@@ -11,7 +11,7 @@ std::map<std::string, Shader> ResourceManager::Shaders;
 std::map<std::string, Texture2D> ResourceManager::Textures;
 
 Shader &ResourceManager::GetShader(std::string name) {
-	return Shaders[name];
+	return Shaders.at(name);
 }
 
 Shader &ResourceManager::LoadShader(std::string name, const char *vShaderFile, const char *fShaderFile, const char *gShaderFile) {
@@ -151,7 +151,7 @@ Texture2D &ResourceManager::LoadTexture(std::string name, const char *file) {
 }
 
 Texture2D &ResourceManager::GetTexture(std::string name) {
-	return Textures[name];
+	return Textures.at(name);
 }
 
 void ResourceManager::Clear() {

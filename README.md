@@ -8,17 +8,23 @@
 <https://dev.to/painkiller/2d-physics-engine-with-c-208l> \
 <https://johanhelsing.studio/posts/bevy-xpbd/>
 
+## General TODOs
+
+- [ ] improve spriteRenderer and frag shader in game to match physics-sim
+- [ ] couple shader with renderer and init shader inside renderer (not renderObject!)
+
 ## TODO
 
 - [ ] fix all in-code todos
 
 ###
 
-- [ ] improve ball rendering - add ability to change radius etc.
+- [x] improve ball rendering - add ability to change radius etc.
 - [ ] add imgui
 - [x] improve stability
 - [ ] add readme instructions
 - [x] right click to spawn balls!
+- [ ] add fps count
 
 ###
 
