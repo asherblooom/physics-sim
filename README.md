@@ -25,12 +25,13 @@
 - [ ] add readme instructions
 - [x] right click to spawn balls!
 - [ ] add fps count
+- [ ] write a 'what i learned' thing - iterations, optimising etc.
 
 ###
 
-- [ ] add broad phase and narrow phase collision detection
+- [x] add broad phase and narrow phase collision detection
+- [ ] add broad phase and narrow phase collision detection _for container!_
 - [ ] add capsule colliders and ability to sweep bounding volumes
-- [ ] write a 'what i learned' thing - iterations, optimising etc.
 
 ###
 

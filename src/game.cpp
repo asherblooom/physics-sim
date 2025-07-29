@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include "game_object.hpp"
+#include "render/circle_renderer.hpp"
 #include "resource_manager.hpp"
 
 Game::Game(unsigned int width, unsigned int height)
@@ -23,6 +24,7 @@ void Game::Init() {
 	spriteShader.SetMatrix4("projection", projection);
 	// set render-specific controls
 	renderer = new SpriteRenderer();
+	circleRenderer = new CircleRenderer();
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 	ResourceManager::LoadTexture("plane-h", "textures/plane-h.dds");
@@ -113,7 +115,7 @@ void Game::Update(float dt) {
 
 void Game::Render() {
 	for (GameObject& ball : balls) {
-		renderer->DrawSprite(*ball.Render);
+		circleRenderer->DrawCircle(*ball.Render);
 	}
 	for (GameObject& c : container) {
 		renderer->DrawSprite(*c.Render);

@@ -1,4 +1,6 @@
-#include "sprite_renderer.hpp"
+#include "circle_renderer.hpp"
+#include <iostream>
+#include <vector>
 
 struct vertex {
 	// Position
@@ -9,15 +11,15 @@ struct vertex {
 	float t;
 };
 
-SpriteRenderer::SpriteRenderer() {
+CircleRenderer::CircleRenderer() {
 	initRenderData();
 }
 
-SpriteRenderer::~SpriteRenderer() {
+CircleRenderer::~CircleRenderer() {
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void SpriteRenderer::DrawSprite(RenderObject& object) {
+void CircleRenderer::DrawCircle(RenderObject& object) {
 	const Transform& transform = object.transform();
 	// prepare transformations
 	object.shader.Use();
@@ -40,40 +42,33 @@ void SpriteRenderer::DrawSprite(RenderObject& object) {
 	object.Texture.Bind();
 
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, numSegments + 2);
 	glBindVertexArray(0);
 }
 
-void DrawCircle(float cx, float cy, float r, int num_segments, vertex vertices[]) {
-	float theta = 2 * 3.1415926 / float(num_segments);
-	float c = cosf(theta);	//precalculate the sine and cosine
-	float s = sinf(theta);
-	float t;
+void genPoints(float cx, float cy, float r, int num_segments, std::vector<vertex>& vertices) {
+	vertices.emplace_back(cx, cy, 0, 0);
+	for (int i = 0; i < num_segments + 1; i++) {
+		float theta = 2.0f * 3.1415926f * float(i) / float(num_segments);  //get the current angle
 
-	float x = r;  //we start at angle = 0
-	float y = 0;
+		float x = r * cosf(theta);	//calculate the x component
+		float y = r * sinf(theta);	//calculate the y component
 
-	for (int i = 0; i < num_segments; i++) {
-		vertices[i] = {x + cx, y + cy, 0, 0};
-
-		//apply the rotation matrix
-		t = x;
-		x = c * x - s * y;
-		y = s * t + c * y;
+		vertices.emplace_back(x + cx, y + cy, 0, 0);  //output vertex 	// y = s * t + c * y;
 	}
 }
 
-void SpriteRenderer::initRenderData() {
+void CircleRenderer::initRenderData() {
 	// configure VAO/VBO
 	unsigned int VBO;
 
-	vertex vertices[16];
-	DrawCircle(0.5, 0.5, 0.5, 16, vertices);
+	std::vector<vertex> vertices;
+	genPoints(0.5, 0.5, 0.5, numSegments, vertices);
 
 	// initialise VBO buffer and fill it with data from vertices
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex), vertices.data(), GL_STATIC_DRAW);
 
 	// transfer data from VBO buffer to VAO indices 0 and 1
 	glGenVertexArrays(1, &VAO);

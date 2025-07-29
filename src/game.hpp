@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "game_object.hpp"
+#include "render/circle_renderer.hpp"
 #include "render/sprite_renderer.hpp"
 #include "resource_manager.hpp"
 
@@ -14,6 +15,7 @@ private:
 	unsigned int width, height;
 	// this is a pointer so that we can choose when to destruct it (that is, before glfwTerminate is called)
 	SpriteRenderer* renderer;
+	CircleRenderer* circleRenderer;
 
 	std::vector<GameObject> balls;
 	// stores indicies of GameObjects in balls in sorted order, used for quicker sorting and making sure selectedBall always points to the same object
@@ -34,6 +36,7 @@ public:
 	Game(unsigned int width, unsigned int height);
 	~Game() {
 		delete renderer;
+		delete circleRenderer;
 		ResourceManager::Clear();
 	}
 	// initialize game state (load all shaders/textures/levels)
