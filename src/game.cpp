@@ -11,10 +11,9 @@ Game::Game(unsigned int width, unsigned int height)
 	: width(width), height(height) {}
 
 void Game::Init() {
-	// load shaders
 	ResourceManager::LoadShader("sprite", "src/shaders/sprite.vert", "src/shaders/sprite.frag");
 	ResourceManager::LoadShader("circle", "src/shaders/sprite.vert", "src/shaders/circle.frag");
-	// configure shaders
+
 	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 	Shader& spriteShader = ResourceManager::GetShader("sprite");
 	Shader& ballShader = ResourceManager::GetShader("circle");
@@ -22,21 +21,21 @@ void Game::Init() {
 	ballShader.SetMatrix4("projection", projection);
 	spriteShader.Use();
 	spriteShader.SetMatrix4("projection", projection);
-	// set render-specific controls
-	renderer = new SpriteRenderer();
-	circleRenderer = new CircleRenderer();
+
+	renderer = new SpriteRenderer(spriteShader);
+	circleRenderer = new CircleRenderer(ballShader);
+
 	// load textures
 	ResourceManager::LoadTexture("ball", "textures/circle.dds");
 	ResourceManager::LoadTexture("plane-h", "textures/plane-h.dds");
 	ResourceManager::LoadTexture("plane-v", "textures/plane-v.dds");
 
-	//TODO: add another constructor for static objects
+	// TODO: add another constructor for static objects
 	auto planeTexH = ResourceManager::GetTexture("plane-h");
 	auto planeTexV = ResourceManager::GetTexture("plane-v");
-	auto planeShader = ResourceManager::GetShader("sprite");
-	container.emplace_back(glm::vec2(0, height - 40), glm::vec2(width, 20), AABB, planeTexH, planeShader);
-	container.emplace_back(glm::vec2(0, height / 3.0f - 20), glm::vec2(20, height * (2.0f / 3.0f)), AABB, planeTexV, planeShader);
-	container.emplace_back(glm::vec2(width - 20, height / 3.0f - 20), glm::vec2(20, height * (2.0f / 3.0f)), AABB, planeTexV, planeShader);
+	container.emplace_back(glm::vec2(0, height - 40), glm::vec2(width, 20), AABB, planeTexH);
+	container.emplace_back(glm::vec2(0, height / 3.0f - 20), glm::vec2(20, height * (2.0f / 3.0f)), AABB, planeTexV);
+	container.emplace_back(glm::vec2(width - 20, height / 3.0f - 20), glm::vec2(20, height * (2.0f / 3.0f)), AABB, planeTexV);
 	for (GameObject& c : container) {
 		c.Physics->Static = true;
 	}
@@ -115,17 +114,15 @@ void Game::Update(float dt) {
 
 void Game::Render() {
 	for (GameObject& ball : balls) {
-		circleRenderer->DrawCircle(*ball.Render);
+		circleRenderer->Draw(*ball.Render);
 	}
 	for (GameObject& c : container) {
-		renderer->DrawSprite(*c.Render);
+		renderer->Draw(*c.Render);
 	}
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
 	auto ballTex = ResourceManager::GetTexture("ball");
-	auto ballShader = ResourceManager::GetShader("circle");
-	ballShader.Use();
 	float diameter = 50.0f;
 	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
 
@@ -137,10 +134,10 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 				selectedBall = nullptr;
 			}
 		}
-		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
+		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, 1.0f, velocity, color);
 		selectedBall = &balls.at(selectedLoc);
 	} else
-		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, ballShader, 1.0f, velocity, color);
+		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, 1.0f, velocity, color);
 	ballsIndex.emplace_back(balls.size() - 1);
 	return balls.back();
 }

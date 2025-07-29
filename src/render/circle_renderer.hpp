@@ -7,19 +7,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "render_object.hpp"
+#include "renderer.hpp"
+#include "shader.hpp"
 
-class CircleRenderer {
+class CircleRenderer : public Renderer {
 public:
-	CircleRenderer();
+	CircleRenderer(Shader shader, unsigned int segments = 32);
 	~CircleRenderer();
 	// Renders a defined quad textured with given sprite
-	void DrawCircle(RenderObject& object);
+	void Draw(RenderObject& object) override;
 
 private:
-	int numSegments = 32;
-	unsigned int VAO;
+	unsigned int numSegments;
 	// Initializes and configures VAO
-	void initRenderData();
+	void initVertices() override;
 };
 
 #endif

@@ -7,18 +7,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "render_object.hpp"
+#include "renderer.hpp"
+#include "shader.hpp"
 
-class SpriteRenderer {
+class SpriteRenderer : public Renderer {
 public:
-	SpriteRenderer();
+	SpriteRenderer(Shader shader);
 	~SpriteRenderer();
 	// Renders a defined quad textured with given sprite
-	void DrawSprite(RenderObject& object);
+	void Draw(RenderObject& object) override;
 
 private:
-	unsigned int VAO;
 	// Initializes and configures VAO
-	void initRenderData();
+	void initVertices() override;
 };
 
 #endif
