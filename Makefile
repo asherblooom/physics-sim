@@ -6,37 +6,42 @@ OBJ_DIR:=./obj
 SRC_DIR:=./src
 
 GLAD_OBJ := $(OBJ_DIR)/glad.o
-GLAD_SRC := $(LIB_DIR)/glad/glad.c
+IMGUI_BACKENDS := $(OBJ_DIR)/imgui_impl_glfw.o $(OBJ_DIR)/imgui_impl_opengl3.o
 
 # Find all the C++ files we want to compile
-SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
+SRCS := $(shell find $(SRC_DIR) -name '*.cpp') $(shell find $(LIB_DIR)/imgui -maxdepth 1 -name '*.cpp')
 # get a list of object files we want to compile by removing the 
 # paths from the source files and then substituing .cpp for .o
 _OBJS := $(patsubst %.cpp,%.o,$(notdir $(SRCS)))
-# add the object directory to the front of the object files
-OBJS := $(_OBJS:%=$(OBJ_DIR)/%)
+# add the object directory to the front of the object files and add other object files we want to compile
+OBJS := $(_OBJS:%=$(OBJ_DIR)/%) $(IMGUI_BACKENDS) $(GLAD_OBJ)
+
 
 .PHONY: main
 
 main: obj $(TARGET_EXEC)
 
-$(TARGET_EXEC): $(OBJS) $(GLAD_OBJ)
+$(TARGET_EXEC): $(OBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS)
 
-# find sources not in base directory
+# compile sources not in base directory
 $(OBJ_DIR)/%.o: $(SRC_DIR)/*/%.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
 
-# find sources in base directory
+# compile sources in base directory
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) -o $@ $< $(CXXFLAGS) -c
+
+# compile lib sources
+$(OBJ_DIR)/%.o: $(LIB_DIR)/*/%.cpp
+	$(CXX) -o $@ $< $(CXXFLAGS) -c
+
+$(OBJ_DIR)/%.o: $(LIB_DIR)/*/*/%.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
 
 obj: 
 	mkdir -p obj
 
-# compiles the glad library
-$(GLAD_OBJ): $(GLAD_SRC) 
-	$(CXX) -I$(LIB_DIR) $< -o $@ -c
 
 
 .PHONY: clean
