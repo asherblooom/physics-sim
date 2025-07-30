@@ -1,8 +1,12 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
 #include <glm/glm.hpp>
 #include <iostream>
+
 #include "game.hpp"
 
 const unsigned int SCR_WIDTH = 1920;
@@ -47,6 +51,19 @@ int main() {
 		return -1;
 	}
 
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+
+	// Setup Dear imgui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO &io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	// Setup Platform/Renderer backends for imgui
+	ImGui_ImplGlfw_InitForOpenGL(window, true);	 // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -54,10 +71,6 @@ int main() {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	framebuffer_size_callback(window, width, height);
-
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	physSim->Init();
 
@@ -72,6 +85,13 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		glfwPollEvents();
+
+		// Start the imgui frame
+		// --------------------------
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();  // Show demo window! :)
 
 		// manage user input
 		// -----------------
@@ -92,9 +112,16 @@ int main() {
 		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		physSim->Render();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 	}
+
+	// shutdown
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 	delete physSim;
 	glfwTerminate();
 	return 0;
@@ -141,6 +168,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS ||
 		glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (ImGui::GetIO().WantCaptureKeyboard) return;
 	if (key >= 0 && key < 1024) {
 		if (action == GLFW_PRESS)
 			physSim->Keys[key] = true;
@@ -174,6 +202,7 @@ void updateMousePosition(GLFWwindow *window, double xpos, double ypos) {
 // callback for processing mouse input
 void mouse_button_callback(GLFWwindow *window, int button, int action,
 						   int mods) {
+	if (ImGui::GetIO().WantCaptureMouse) return;
 	if (button >= 0 && button <= 2) {
 		if (action == GLFW_PRESS)
 			physSim->MouseButtons[button] = true;
