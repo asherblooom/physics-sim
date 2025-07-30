@@ -19,7 +19,7 @@
 - [x] improve stability
 - [ ] add readme instructions
 - [x] right click to spawn balls!
-- [ ] add fps count
+- [x] add fps count
 - [ ] write a 'what i learned' thing - iterations, optimising etc.
 
 ###

@@ -6,6 +6,8 @@
 #include <imgui/imgui.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <algorithm>
+#include <charconv>
+#include <cstdio>
 #include <iostream>
 
 #include "game_object.hpp"
@@ -143,6 +145,7 @@ void Game::Render() {
 
 void Game::ShowImGuiWindow() {
 	ImGui::Begin("Rigid Body Simulator");
+	ImGui::Text("%f fps", ImGui::GetIO().Framerate);
 	ImGui::Text("Globals:");
 	ImGui::Combo("Rendering Method", &selectedItem, "texture\0triangle fan\0\0");
 	ImGui::SliderInt("Triangle Count", &triangleCount, 1, 32);
