@@ -28,6 +28,14 @@ private:
 	GameObject& makeBall(glm::vec2 pos, glm::vec3 color, glm::vec2 velocity);
 	std::vector<CollisionInfo> sweepAndPruneCollisions(std::vector<GameObject>& balls, std::vector<GameObject>& container);
 
+	//Imgui variables
+	int ballNum = 1;
+	float gravity = 9.81;
+	float damping = 0.1;
+	float radius = 25.0;
+	float mass = 1.0;
+	float elasticity = 0.8;
+
 public:
 	bool Keys[1024];
 	bool MouseButtons[3];
@@ -45,6 +53,7 @@ public:
 	void ProcessInput(float dt);
 	void Update(float dt);
 	void Render();
+	void ShowImGuiWindow();
 };
 
 #endif

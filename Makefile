@@ -5,16 +5,18 @@ CXXFLAGS:=-I$(LIB_DIR) -Wall -Wextra -Wno-unused-parameter -lglfw -lGL -lX11 -lp
 OBJ_DIR:=./obj
 SRC_DIR:=./src
 
-GLAD_OBJ := $(OBJ_DIR)/glad.o
-IMGUI_BACKENDS := $(OBJ_DIR)/imgui_impl_glfw.o $(OBJ_DIR)/imgui_impl_opengl3.o
+GLAD_OBJ := glad.o
+IMGUI_BACKENDS := imgui_impl_glfw.o imgui_impl_opengl3.o
+IMGUI_EXTRAS := imgui_stdlib.o
 
 # Find all the C++ files we want to compile
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp') $(shell find $(LIB_DIR)/imgui -maxdepth 1 -name '*.cpp')
 # get a list of object files we want to compile by removing the 
 # paths from the source files and then substituing .cpp for .o
-_OBJS := $(patsubst %.cpp,%.o,$(notdir $(SRCS)))
-# add the object directory to the front of the object files and add other object files we want to compile
-OBJS := $(_OBJS:%=$(OBJ_DIR)/%) $(IMGUI_BACKENDS) $(GLAD_OBJ)
+# and add other object files
+_OBJS := $(patsubst %.cpp,%.o,$(notdir $(SRCS))) $(GLAD_OBJ) $(IMGUI_BACKENDS) $(IMGUI_EXTRAS)
+# add the object directory to the front of the object files
+OBJS := $(_OBJS:%=$(OBJ_DIR)/%)
 
 
 .PHONY: main
@@ -37,6 +39,9 @@ $(OBJ_DIR)/%.o: $(LIB_DIR)/*/%.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
 
 $(OBJ_DIR)/%.o: $(LIB_DIR)/*/*/%.cpp
+	$(CXX) -o $@ $< $(CXXFLAGS) -c
+
+$(OBJ_DIR)/%.o: $(LIB_DIR)/*/*/*/%.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) -c
 
 obj: 

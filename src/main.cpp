@@ -54,6 +54,10 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	// set initial viewport
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	framebuffer_size_callback(window, width, height);
 
 	// Setup Dear imgui context
 	IMGUI_CHECKVERSION();
@@ -67,13 +71,7 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// set initial viewport
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	framebuffer_size_callback(window, width, height);
-
 	physSim->Init();
-
 	float deltaTime, lastFrame = 0.0f;
 	double xpos, ypos;
 
@@ -87,11 +85,10 @@ int main() {
 		glfwPollEvents();
 
 		// Start the imgui frame
-		// --------------------------
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();  // Show demo window! :)
+		physSim->ShowImGuiWindow();
 
 		// manage user input
 		// -----------------
@@ -112,8 +109,6 @@ int main() {
 		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		physSim->Render();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 	}

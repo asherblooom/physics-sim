@@ -1,8 +1,13 @@
 #include "game.hpp"
 
 #include <GLFW/glfw3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 #include <algorithm>
 #include <iostream>
+
 #include "game_object.hpp"
 #include "render/circle_renderer.hpp"
 #include "resource_manager.hpp"
@@ -43,23 +48,27 @@ void Game::Init() {
 
 void Game::ProcessInput(float dt) {
 	if (Keys[GLFW_KEY_N]) {
-		makeBall(glm::vec2(width / 2, height / 10),
-				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
-				 glm::vec2(0));
+		for (int i = 0; i < ballNum; i++) {
+			makeBall(glm::vec2(width / 2 + i, height / 10),
+					 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
+					 glm::vec2(0));
+		}
 		// only want one ball per key press
 		Keys[GLFW_KEY_N] = false;
 	}
 	if (Keys[GLFW_KEY_M]) {
-		makeBall(glm::vec2(width - 100, height - 100),
+		makeBall(glm::vec2(width - 100, height - 200),
 				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
 				 glm::vec2(-15, 15));
 		// only want one ball per key press
 		Keys[GLFW_KEY_M] = false;
 	}
 	if (MouseButtons[GLFW_MOUSE_BUTTON_RIGHT]) {
-		makeBall(glm::vec2(MousePos.x, MousePos.y),
-				 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
-				 glm::vec2(0));
+		for (int i = 0; i < ballNum; i++) {
+			makeBall(glm::vec2(MousePos.x + i, MousePos.y),
+					 glm::vec3((float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX, (float)std::rand() / RAND_MAX),
+					 glm::vec2(0));
+		}
 		// only want one ball per press
 		MouseButtons[GLFW_MOUSE_BUTTON_RIGHT] = false;
 	}
@@ -102,7 +111,7 @@ void Game::Update(float dt) {
 
 		for (GameObject& ball : balls) {
 			// if (!(&ball == selectedBall && MouseButtons[GLFW_MOUSE_BUTTON_LEFT]))
-			ball.Physics->ResolveForces(dt);
+			ball.Physics->ResolveForces(dt, {0, -gravity}, damping);
 		}
 		std::vector<CollisionInfo> collisions = sweepAndPruneCollisions(balls, container);
 		//solve collisions
@@ -113,6 +122,9 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	for (GameObject& ball : balls) {
 		circleRenderer->Draw(*ball.Render);
 	}
@@ -123,8 +135,7 @@ void Game::Render() {
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
 	auto ballTex = ResourceManager::GetTexture("ball");
-	float diameter = 50.0f;
-	glm::vec2 pos = center - glm::vec2(diameter / 2.0f);
+	glm::vec2 pos = center - glm::vec2(radius);
 
 	if (selectedBall) {
 		int selectedLoc = 0;
@@ -134,10 +145,11 @@ GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity
 				selectedBall = nullptr;
 			}
 		}
-		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, 1.0f, velocity, color);
+		balls.emplace_back(pos, glm::vec2(radius * 2), CIRCLE, ballTex, mass, velocity, color);
 		selectedBall = &balls.at(selectedLoc);
 	} else
-		balls.emplace_back(pos, glm::vec2(diameter), CIRCLE, ballTex, 1.0f, velocity, color);
+		balls.emplace_back(pos, glm::vec2(radius * 2), CIRCLE, ballTex, mass, velocity, color);
+	balls.back().Physics->Elasticity = elasticity;
 	ballsIndex.emplace_back(balls.size() - 1);
 	return balls.back();
 }
@@ -170,4 +182,17 @@ std::vector<CollisionInfo> Game::sweepAndPruneCollisions(std::vector<GameObject>
 		}
 	}
 	return collisions;
+}
+
+void Game::ShowImGuiWindow() {
+	ImGui::Begin("Rigid Body Simulator");
+	ImGui::Text("Globals:");
+	ImGui::SliderFloat("Gravity", &gravity, 0.0f, 20.0f);
+	ImGui::SliderFloat("Damping", &damping, 0.0f, 1.0f);
+	ImGui::Text("For new balls:");
+	ImGui::SliderInt("Number of Balls", &ballNum, 0, 20);
+	ImGui::SliderFloat("Radius", &radius, 0.0f, 100.0f);
+	ImGui::SliderFloat("Mass", &mass, 1.0f, 10.0f);
+	ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f);
+	ImGui::End();
 }

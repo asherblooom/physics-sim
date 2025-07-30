@@ -13,6 +13,8 @@ void PhysObject::AddForce(glm::vec2 force) {
 void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor) {
 	if (Static) return;
 
+	dampingFactor = 1.0f - dampingFactor;
+
 	glm::vec2 acceleration = force * InverseMass;
 	gravity.y = -gravity.y;
 	if (HasGravity) acceleration += gravity;
