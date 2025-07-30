@@ -127,10 +127,16 @@ void Game::Render() {
 			renderer->Draw(*ball.Render);
 	}
 	if (selectedItem == 1) {
+		if (triangleCount != (int)circleRenderer->Segments()) {
+			delete circleRenderer;
+			Shader& ballShader = ResourceManager::GetShader("circle");
+			circleRenderer = new CircleRenderer(ballShader, triangleCount);
+		}
 		for (GameObject& ball : balls)
 			circleRenderer->Draw(*ball.Render);
 	}
 	for (GameObject& c : container) {
+		c.Physics->Elasticity = containerElasticity;
 		renderer->Draw(*c.Render);
 	}
 }
@@ -138,23 +144,14 @@ void Game::Render() {
 void Game::ShowImGuiWindow() {
 	ImGui::Begin("Rigid Body Simulator");
 	ImGui::Text("Globals:");
-	const char* renderingMethods[] = {"texture", "traingle fan"};
-	if (ImGui::BeginCombo("Rendering Method", renderingMethods[selectedItem])) {
-		for (int n = 0; n < IM_ARRAYSIZE(renderingMethods); n++) {
-			const bool is_selected = (selectedItem == n);
-			if (ImGui::Selectable(renderingMethods[n], is_selected))
-				selectedItem = n;
-			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-			if (is_selected)
-				ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-	ImGui::SliderFloat("Gravity", &gravity, 0.0f, 20.0f);
-	ImGui::SliderFloat("Damping", &damping, 0.0f, 1.0f);
+	ImGui::Combo("Rendering Method", &selectedItem, "texture\0triangle fan\0\0");
+	ImGui::SliderInt("Triangle Count", &triangleCount, 1, 32);
+	ImGui::SliderFloat("Gravity", &gravity, 0.0f, 50.0f);
+	ImGui::SliderFloat("Damping", &damping, 0.0f, 0.9f);
+	ImGui::SliderFloat("Container Elasticity", &containerElasticity, 0.0f, 1.0f);
 	ImGui::Text("For new balls:");
 	ImGui::SliderInt("Number of Balls", &ballNum, 0, 20);
-	ImGui::SliderFloat("Radius", &radius, 0.0f, 100.0f);
+	ImGui::SliderFloat("Radius", &radius, 1.0f, 100.0f);
 	ImGui::SliderFloat("Mass", &mass, 1.0f, 100.0f);
 	ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f);
 	if (ImGui::Button("Clear")) {

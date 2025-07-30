@@ -16,6 +16,7 @@ public:
 	~CircleRenderer();
 	// Renders a defined quad textured with given sprite
 	void Draw(RenderObject& object) override;
+	const unsigned int& Segments() const { return numSegments; }
 
 private:
 	unsigned int numSegments;
