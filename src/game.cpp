@@ -122,15 +122,47 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	for (GameObject& ball : balls) {
-		circleRenderer->Draw(*ball.Render);
+	if (selectedItem == 0) {
+		for (GameObject& ball : balls)
+			renderer->Draw(*ball.Render);
+	}
+	if (selectedItem == 1) {
+		for (GameObject& ball : balls)
+			circleRenderer->Draw(*ball.Render);
 	}
 	for (GameObject& c : container) {
 		renderer->Draw(*c.Render);
 	}
+}
+
+void Game::ShowImGuiWindow() {
+	ImGui::Begin("Rigid Body Simulator");
+	ImGui::Text("Globals:");
+	const char* renderingMethods[] = {"texture", "traingle fan"};
+	if (ImGui::BeginCombo("Rendering Method", renderingMethods[selectedItem])) {
+		for (int n = 0; n < IM_ARRAYSIZE(renderingMethods); n++) {
+			const bool is_selected = (selectedItem == n);
+			if (ImGui::Selectable(renderingMethods[n], is_selected))
+				selectedItem = n;
+			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::SliderFloat("Gravity", &gravity, 0.0f, 20.0f);
+	ImGui::SliderFloat("Damping", &damping, 0.0f, 1.0f);
+	ImGui::Text("For new balls:");
+	ImGui::SliderInt("Number of Balls", &ballNum, 0, 20);
+	ImGui::SliderFloat("Radius", &radius, 0.0f, 100.0f);
+	ImGui::SliderFloat("Mass", &mass, 1.0f, 100.0f);
+	ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f);
+	if (ImGui::Button("Clear")) {
+		selectedBall = nullptr;
+		balls.clear();
+		ballsIndex.clear();
+	}
+	ImGui::End();
 }
 
 GameObject& Game::makeBall(glm::vec2 center, glm::vec3 color, glm::vec2 velocity) {
@@ -182,17 +214,4 @@ std::vector<CollisionInfo> Game::sweepAndPruneCollisions(std::vector<GameObject>
 		}
 	}
 	return collisions;
-}
-
-void Game::ShowImGuiWindow() {
-	ImGui::Begin("Rigid Body Simulator");
-	ImGui::Text("Globals:");
-	ImGui::SliderFloat("Gravity", &gravity, 0.0f, 20.0f);
-	ImGui::SliderFloat("Damping", &damping, 0.0f, 1.0f);
-	ImGui::Text("For new balls:");
-	ImGui::SliderInt("Number of Balls", &ballNum, 0, 20);
-	ImGui::SliderFloat("Radius", &radius, 0.0f, 100.0f);
-	ImGui::SliderFloat("Mass", &mass, 1.0f, 10.0f);
-	ImGui::SliderFloat("Elasticity", &elasticity, 0.0f, 1.0f);
-	ImGui::End();
 }

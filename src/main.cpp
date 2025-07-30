@@ -108,6 +108,8 @@ int main() {
 		// ------
 		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		physSim->Render();
 
 		glfwSwapBuffers(window);

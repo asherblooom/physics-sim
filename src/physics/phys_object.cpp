@@ -13,8 +13,6 @@ void PhysObject::AddForce(glm::vec2 force) {
 void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor) {
 	if (Static) return;
 
-	dampingFactor = 1.0f - dampingFactor;
-
 	glm::vec2 acceleration = force * InverseMass;
 	gravity.y = -gravity.y;
 	if (HasGravity) acceleration += gravity;
@@ -26,7 +24,8 @@ void PhysObject::ResolveForces(float dt, glm::vec2 gravity, float dampingFactor)
 	transform.Position += (velocity * dt) * 30.0f;
 
 	// consistent amount of damping regardless of framerate
-	float damping = powf(dampingFactor, dt);
+	// we want smaller dampingFactor = less damping, so we subtract from 1
+	float damping = powf(1 - dampingFactor, dt);
 	velocity *= damping;
 	force = glm::vec2(0, 0);
 }
