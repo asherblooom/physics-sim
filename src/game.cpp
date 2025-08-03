@@ -124,11 +124,11 @@ void Game::Update(float dt) {
 }
 
 void Game::Render() {
-	if (selectedItem == 0) {
+	if (selectedRenderer == 0) {
 		for (GameObject& ball : balls)
 			renderer->Draw(*ball.Render);
 	}
-	if (selectedItem == 1) {
+	if (selectedRenderer == 1) {
 		if (triangleCount != (int)circleRenderer->Segments()) {
 			delete circleRenderer;
 			Shader& ballShader = ResourceManager::GetShader("circle");
@@ -147,9 +147,9 @@ void Game::ShowImGuiWindow() {
 	ImGui::Begin("Rigid Body Simulator");
 	ImGui::Text("%f fps", ImGui::GetIO().Framerate);
 	ImGui::Text("Globals:");
-	ImGui::Combo("Rendering Method", &selectedItem, "texture\0triangle fan\0\0");
+	ImGui::Combo("Rendering Method", &selectedRenderer, "texture\0triangle fan\0\0");
 	ImGui::SliderInt("Triangle Count", &triangleCount, 1, 32);
-	ImGui::SliderFloat("Gravity", &gravity, 0.0f, 50.0f);
+	ImGui::SliderFloat("Gravity", &gravity, -25.0f, 50.0f);
 	ImGui::SliderFloat("Damping", &damping, 0.0f, 0.9f);
 	ImGui::SliderFloat("Container Elasticity", &containerElasticity, 0.0f, 1.0f);
 	ImGui::Text("For new balls:");

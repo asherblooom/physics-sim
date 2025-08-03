@@ -37,7 +37,7 @@ private:
 	float radius = 25.0;
 	float mass = 1.0;
 	float elasticity = 0.8;
-	int selectedItem = 0;
+	int selectedRenderer = 0;
 	int triangleCount = 32;
 
 public:
